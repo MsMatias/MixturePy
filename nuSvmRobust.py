@@ -89,5 +89,8 @@ def nuSvmRobust(X, Y, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = -1):
     nusvmW = math.sqrt(pow((kW - Y),2).mean())
     corrvW = kW.corr(Y)
 
+    wSel = wSel.where(wSel>delta).fillna(0)
+    w = w.where(w>delta).fillna(0).round(1)
+
     result = pd.Series([wSel, w, nusvm, nusvmW, corrv, corrvW, model.get_params()['nu'], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter'])
     return result

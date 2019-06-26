@@ -49,20 +49,24 @@ def Mixer(X, Y, cores):
     Yn = pd.DataFrame(scaler.transform(Y.values), columns=Y.columns, index=Y.index)
 
     out = list()
-
-    for i, j in Yn.iteritems():
-            print(i)
-            print(j)
-            print('-------------------------')
-            out.append(nuSvmRobust(X = X, Y = j, nuseq = [0.25,0.5,0.75], delta = 0.007))
-
-    return out
     
-    # Run function Multiples cores
-#     num_processors = 3
-#     print(num_processors)
-#     p=Pool(processes = num_processors)
-#     out = list(p.map(lambda Yi: nuSvrR(X = X, Y = Yi, nuseq = [0.25,0.5,0.75], delta = 0.007), Yn))
-#     print(out)
-#     print('asd')
-#     return out
+    p=Pool(processes = cores)
+    out = [p.apply(nuSvmRobust, args=(X, j, [0.25, 0.5, 0.75], 0.007)) for i, j in Yn.iteritems()]
+    matWa = pd.DataFrame()
+    matWp = pd.DataFrame()
+    matRes = pd.DataFrame()
+
+    for i in out:
+        matWa = matWa.append(i.Wa, ignore_index=True)
+        matWp = matWp.append(i.Wp, ignore_index=True)
+        matRes = matRes.append(pd.DataFrame([[i.RMSEa, i.RMSEp, i.Ra, i.Rp,  i.BestParams, i.Iter]], columns=['RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter']), ignore_index=True)
+
+    matWa.index = Y.columns.values
+    matWa.columns = X.columns.values
+
+    matWp.index = Y.columns.values
+    matWp.columns = X.columns.values
+
+    matRes.index = matWp.index.values
+
+    return(pd.DataFrame([[matWa, matWp, matRes]], columns=['MIXabs', 'MIXprop', 'ACCmetrix']))
