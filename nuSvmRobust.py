@@ -36,8 +36,10 @@ def nuSvmRobust(X, Y, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6):
         # Run function
         XX = X.loc[:, X.columns.isin(wSel.columns[wSel.values[0] > 0])]
         model = tuneSvmForDeconv(X = XX, Y = Y, nuseq = [0.25,0.5,0.75], delta = 0.007)
+
         # Get betas
         w = model.coef_
+        
         # Set values i to zero where i < 0
         w = np.where(w<0, 0, w)
 
@@ -89,8 +91,8 @@ def nuSvmRobust(X, Y, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6):
     nusvmW = math.sqrt(pow((kW - Y),2).mean())
     corrvW = kW.corr(Y)
 
-    wSel = wSel.where(wSel>delta).fillna(0)
-    w = w.where(w>delta).fillna(0).round(1)
+    #wSel = wSel.where(wSel>delta).fillna(0)
+    #w = w.where(w>delta).fillna(0).round(1)
 
     result = pd.Series([wSel, w, nusvm, nusvmW, corrv, corrvW, model.get_params()['nu'], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter'])
     return result
