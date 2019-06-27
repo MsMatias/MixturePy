@@ -23,7 +23,7 @@ from tuneSvmForDeconv import tuneSvmForDeconv
 # @param [array] nuseq
 # @param [float] delta
 # @return -------------
-def nuSvmRobust(X, Y, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = -1):
+def nuSvmRobust(X, Y, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6):
 
     wSel = [1 for x in range(len(X.columns))]
     wSel = pd.DataFrame(wSel, X.columns).T
@@ -51,7 +51,7 @@ def nuSvmRobust(X, Y, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = -1):
         w = np.where(w<delta, 0, w)
 
         # Convert array to df
-        w = pd.DataFrame(w[0], X.columns).T
+        w = pd.DataFrame(w[0], XX.columns).T
         
         # Checking if all the values are NaN
         if w.isnull().all().all():
@@ -71,7 +71,7 @@ def nuSvmRobust(X, Y, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = -1):
         if i >= maxIter:
             ok = False
 
-    wOut = pd.DataFrame(wAbs[0], X.columns).T
+    wOut = pd.DataFrame(wAbs[0], XX.columns).T
 
     # Create wSel with all values in zero
     wSel = [0 for x in range(len(X.columns))]

@@ -1,18 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 import numpy as np
 import pandas as pd
 import os, math
 
 from sklearn.svm import NuSVR
-
-
-# In[2]:
-
 
 # Function nuSvr (Not import)
 # Run NuSvr with expression Matrix and signature Matrix
@@ -46,10 +39,6 @@ def nuSvr(X, Y, nu, delta):
     # Get Rmse predict for nuseq
     RmsePredict = math.sqrt(pow((Y - predict),2).mean())
     return [RmsePredict, clf]
-
-
-# In[3]:
-
 
 # Function tuneSvmForDeconv
 # Create result nuSvr list with nuseq

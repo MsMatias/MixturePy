@@ -12,6 +12,7 @@ from multiprocessing import Pool
 # from ipynb.fs.full.nuSvrR import nuSvrR
 from nuSvmRobust import nuSvmRobust
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import scale
 
 
 # In[2]:
@@ -44,13 +45,16 @@ def Mixer(X, Y, cores):
     X.reset_index(drop=True, inplace=True)
     
     # Normalize features Matrix
-    scaler = StandardScaler()
-    scaler.fit(Y)
-    Yn = pd.DataFrame(scaler.transform(Y.values), columns=Y.columns, index=Y.index)
+    #scaler = StandardScaler()
+    #scaler.fit(Y)
+    
+    #Yn = pd.DataFrame(scaler.transform(Y.values), columns=Y.columns, index=Y.index)
+
+    Yn = pd.DataFrame(scale(Y), index=Y.index, columns=Y.columns)
 
     out = list()
     
-    p=Pool(processes = cores)
+    p = Pool(processes = cores)
     out = [p.apply(nuSvmRobust, args=(X, j, [0.25, 0.5, 0.75], 0.007)) for i, j in Yn.iteritems()]
     matWa = pd.DataFrame()
     matWp = pd.DataFrame()
