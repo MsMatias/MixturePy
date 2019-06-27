@@ -33,9 +33,15 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
     # Intersection between X and Y
     geneList = X.loc[X['Gene symbol'].isin(Y['Gene symbol'])].sort_values(by=['Gene symbol'])['Gene symbol']
 
+    print('Running mixer with subjects (Count: ' + str(Y.shape[1]) + ')...')
     # Run Mixer Function with original Expressions
     orig = Mixer(X, Y , cores)
+
+    print(orig)
+
+    print('Finish mixer')
     
+    print('Get Medias')
     # Get Media by subject
     totalMediaBySubject = Y.median(axis = 0, skipna = True)
 
@@ -50,13 +56,18 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
   
     matRand = list()
 
-    p=Pool(processes = cores)
-    matRand = [p.apply(sampleRandom, args=(Y, Y.shape[0])) for i in range(iter)]
+    #matRand = [pd.apply(sampleRandom, args=(Y, Y.shape[0])) for i in range(iter)]
+    for i in range(iter):
+            matRand.append(sampleRandom(Y, Y.shape[0]))
+
     matRand = map(list, zip(*matRand))
     matRand = pd.DataFrame(matRand, Y['Gene symbol'])
     matRand.reset_index(drop=True, inplace=True)
     matRand = pd.concat([Y['Gene symbol'], matRand], sort = False, axis = 1)
 
+    print('Finish')
+
+    print('Running mixer with porpulationBased (Count: ' + str(matRand.shape[1]) + ')')
     # Run Mixer Function with Random Matrix
     outMix = Mixer(X, matRand, cores)
 
@@ -70,6 +81,8 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
 
     pValues = result.Subjects[0].ACCmetrix[0].apply(getPValues, args=(result.PermutedMetrix[0], ), axis = 1)
     pValues = pd.DataFrame(pValues.values.tolist(), index = pValues.index, columns=['RMSEa', 'RMSEa', 'Ra', 'Rp']) 
+
+    print('Finish')
 
     generateXlsx (result, pValues, nameFile)
 

@@ -26,6 +26,9 @@ from sklearn.preprocessing import scale
 # @param [int] num Cores
 # @return -------
 def Mixer(X, Y, cores):
+
+    print('Normalizing data')
+
     # Normalize signature Matrix
     mean = X.iloc[:, 1:].mean()
     std = X.iloc[:, 1:].stack().std()
@@ -53,9 +56,19 @@ def Mixer(X, Y, cores):
     Yn = pd.DataFrame(scale(Y), index=Y.index, columns=Y.columns)
 
     out = list()
-    
-    p = Pool(processes = cores)
-    out = [p.apply(nuSvmRobust, args=(X, j, [0.25, 0.5, 0.75], 0.007)) for i, j in Yn.iteritems()]
+    k = 1
+    for i, j in Yn.iteritems():
+            print('--------------------------------------------------')
+            print('Subject: ' + str(i) + ' Nro: ' + str(k))
+            print('--------------------------------------------------')
+            out.append(nuSvmRobust(X = X, Y = j, nuseq = [0.25,0.5,0.75], delta = 0.007))
+            k = k + 1
+
+    #out = [pd.apply(nuSvmRobust, args=(X, j, [0.25, 0.5, 0.75], 0.007)) for i, j in Yn.iteritems()]
+    print('Processing...')
+
+    print('Finish nuSvm')
+
     matWa = pd.DataFrame()
     matWp = pd.DataFrame()
     matRes = pd.DataFrame()

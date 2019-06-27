@@ -3,7 +3,7 @@
 
 # In[1]:
 
-
+from __future__ import print_function
 import numpy as np
 import pandas as pd
 import os, math
@@ -30,12 +30,16 @@ def nuSvmRobust(X, Y, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6):
     ok = True
     i = 0
     model = 0
+
+    print('Iter: ' + str(i), flush=True)
     
     while ok:
         i = i + 1
         # Run function
         XX = X.loc[:, X.columns.isin(wSel.columns[wSel.values[0] > 0])]
         model = tuneSvmForDeconv(X = XX, Y = Y, nuseq = [0.25,0.5,0.75], delta = 0.007)
+
+        print('Iter: ' + str(i), flush=True)
 
         # Get betas
         w = model.coef_
