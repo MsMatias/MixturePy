@@ -4,7 +4,7 @@
 import pandas as pd
 import numpy as np
 import os
-from multiprocessing import Pool, Pipe
+from multiprocessing import Process, Pipe
 from Mixer import Mixer
 import random
 
