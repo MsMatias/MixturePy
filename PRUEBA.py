@@ -19,4 +19,4 @@ X = pd.read_excel('LM22Signature.xlsx', sheet_name = 0)
 Y = pd.read_excel(sys.argv[1] + '.xlsx', sheet_name = 0)
 
 # Run Mixer Function
-	data = Mixture(X, Y , 4, 10, sys.argv[2])
+data = Mixture(X, Y , 4, 10, sys.argv[2])
