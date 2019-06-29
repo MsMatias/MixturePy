@@ -9,7 +9,7 @@ import pandas as pd
 import os
 
 #import  multiprocessing
-from multiprocessing import Pool
+from multiprocessing import Process
 # from ipynb.fs.full.nuSvrR import nuSvrR
 from nuSvmRobust import nuSvmRobust
 from sklearn.preprocessing import StandardScaler
@@ -61,8 +61,15 @@ def Mixer(X, Y, cores):
     print('Processing...')
 
     if __name__ == 'Mixer':
-        with Pool(processes=cores) as pool:
-            out = [pool.apply(nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
+        processes = [Process(target=nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
+
+        for p in processes:
+            p.start()
+
+        for p in processes:
+            p.join()
+    #    with Pool(processes=cores) as pool:
+    #        out = [pool.apply(nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
 
     #for i, j in Yn.iteritems():
     #        print('--------------------------------------------------')
