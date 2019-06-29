@@ -62,7 +62,7 @@ def Mixer(X, Y, cores):
 
     if __name__ == 'Mixer':
         processes = [Process(target=nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
-print(str(processes))
+        print(str(processes))
         for p in processes:
             p.start()
 

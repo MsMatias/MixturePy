@@ -33,7 +33,7 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
 
     if verbose == 1:
         print('--------------------------------------------------')
-        print('Subject: ' + str(subject) + 'Nro. Processor: ' + str(multiprocessing.current_process()))
+        print('Subject: ' + str(subject) + ' Nro. Processor: ' + str(multiprocessing.current_process()))
         print('--------------------------------------------------')
 
     while ok:
