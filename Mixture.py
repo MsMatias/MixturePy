@@ -56,18 +56,20 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
   
     matRand = list()
     pipe_list = []
+    processes = []
 
     if __name__ == 'Mixture':
-            processes = [Process(target=sampleRandom, args=(Y, Y.shape[0])) for i in range(iter)]
-
-            for p in processes:
-                recv_end, send_end = Pipe(False)
-                p.start()
-                pipe_list.append(recv_end)
+            for i in range(iter):
+                    recv_end, send_end = Pipe(False)
+                    p = Process(target=sampleRandom, args=(Y, Y.shape[0], send_end))
+                    processes.append(p)
+                    p.start()
+                    pipe_list.append(recv_end)                
 
             for p in processes:
                 p.join()
-                matRand = [x.recv() for x in pipe_list]
+
+    matRand = [x.recv() for x in pipe_list]
 
     matRand = map(list, zip(*matRand))
     matRand = pd.DataFrame(matRand, Y['Gene symbol'])

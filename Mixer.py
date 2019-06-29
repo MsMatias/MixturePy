@@ -51,20 +51,22 @@ def Mixer(X, Y, cores):
     Yn = pd.DataFrame(scale(Y), index=Y.index, columns=Y.columns)
 
     out = list()
+    processes = []
     pipe_list = []
     print('Processing...')
 
-    if __name__ == 'Mixer':        
-        processes = [Process(target=nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
-
-        for p in processes:
+    if __name__ == 'Mixer':
+        for i, j in Yn.iteritems():
             recv_end, send_end = Pipe(False)
+            p = Process(target=nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1, send_end))
+            processes.append(p)
             p.start()
             pipe_list.append(recv_end)
 
         for p in processes:
             p.join()
-            out = [x.recv() for x in pipe_list]
+
+        out = [x.recv() for x in pipe_list]
     
     print('Finish nuSvm')
 
