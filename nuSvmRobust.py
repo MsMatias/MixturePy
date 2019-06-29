@@ -31,7 +31,9 @@ def nuSvmRobust(X, Y, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6):
     i = 0
     model = 0
 
-    print('Iter: ' + str(i), flush=True)
+    print('--------------------------------------------------')
+    print('Subject: ' + str(Y))
+    print('--------------------------------------------------')
     
     while ok:
         i = i + 1

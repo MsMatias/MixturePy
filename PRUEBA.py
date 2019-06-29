@@ -21,7 +21,7 @@ Y = pd.read_excel(sys.argv[1] + '.xlsx', sheet_name = 0)
 
 # Run Mixer Function
 if __name__ == '__main__':
-	p = Process(target=Mixture, args=(X, Y , 1, 10, sys.argv[2]))
+	p = Process(target=Mixture, args=(X, Y , 4, 10, sys.argv[2]))
 	p.start()
 	p.join()
 
