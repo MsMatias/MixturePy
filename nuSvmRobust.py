@@ -19,7 +19,7 @@ from tuneSvmForDeconv import tuneSvmForDeconv
 # @param [array] nuseq
 # @param [float] delta
 # @return -------------
-def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6, verbose = 0, send_end):
+def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6, verbose = 0, send_end = ''):
 
     wSel = [1 for x in range(len(X.columns))]
     wSel = pd.DataFrame(wSel, X.columns).T
