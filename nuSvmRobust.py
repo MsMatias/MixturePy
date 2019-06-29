@@ -23,7 +23,7 @@ from tuneSvmForDeconv import tuneSvmForDeconv
 # @param [array] nuseq
 # @param [float] delta
 # @return -------------
-def nuSvmRobust(X, Y, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6):
+def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6, verbose = 0):
 
     wSel = [1 for x in range(len(X.columns))]
     wSel = pd.DataFrame(wSel, X.columns).T
@@ -31,16 +31,18 @@ def nuSvmRobust(X, Y, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6):
     i = 0
     model = 0
 
-    print('--------------------------------------------------')
-    print('Subject: ' + str(Y.index))
-    print('--------------------------------------------------')
+    if verbose == 1:
+        print('--------------------------------------------------')
+        print('Subject: ' + str(subject))
+        print('--------------------------------------------------')
     
     while ok:
         i = i + 1
         # Run function
         XX = X.loc[:, X.columns.isin(wSel.columns[wSel.values[0] > 0])]
         model = tuneSvmForDeconv(X = XX, Y = Y, nuseq = [0.25,0.5,0.75], delta = 0.007)
-
+	
+	if verbose == 1:
         print('Iter: ' + str(i), flush=True)
 
         # Get betas
