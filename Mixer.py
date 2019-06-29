@@ -48,40 +48,20 @@ def Mixer(X, Y, cores):
     Y = Y.iloc[:, 1:]
     X.reset_index(drop=True, inplace=True)
     
-    # Normalize features Matrix
-    #scaler = StandardScaler()
-    #scaler.fit(Y)
-    
-    #Yn = pd.DataFrame(scaler.transform(Y.values), columns=Y.columns, index=Y.index)
-
     Yn = pd.DataFrame(scale(Y), index=Y.index, columns=Y.columns)
 
     out = list()
-
     print('Processing...')
 
     if __name__ == 'Mixer':
         processes = [Process(target=nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
-        print(str(processes))
+
         for p in processes:
             p.start()
 
         for p in processes:
             p.join()
-    #    with Pool(processes=cores) as pool:
-    #        out = [pool.apply(nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
-
-    #for i, j in Yn.iteritems():
-    #        print('--------------------------------------------------')
-    #        print('Subject: ' + str(i) + ' Nro: ' + str(k))
-    #        print('--------------------------------------------------')
-    #        out.append(nuSvmRobust(X = X, Y = j, nuseq = [0.25,0.5,0.75], delta = 0.007))
-    #        k = k + 1
-    #if __name__ == 'Mixer':
-    #    p = multiprocessing.Pool(processes = cores)
-        #out = [p.apply(nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
-
-    #out = [pd.apply(nuSvmRobust, args=(X, j, [0.25, 0.5, 0.75], 0.007)) for i, j in Yn.iteritems()]
+            out.append(p.exitcode)
     
     print('Finish nuSvm')
 

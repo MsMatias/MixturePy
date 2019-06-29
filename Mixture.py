@@ -12,7 +12,7 @@ def sampleRandom (Y, n):
     Y = Y.iloc[:, 1:]
     vector = Y.to_numpy(copy=True)
     vector = vector.flatten()
-    return vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]]
+    exit(vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]])
 
 def getPValues (x, i):
     return pd.DataFrame([sum(i.loc[:,'RMSEa'] < x.RMSEa),
@@ -56,10 +56,6 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
   
     matRand = list()
 
-    #matRand = [pd.apply(sampleRandom, args=(Y, Y.shape[0])) for i in range(iter)]
-    #for i in range(iter):
-    #        matRand.append(sampleRandom(Y, Y.shape[0]))
-
     if __name__ == 'Mixture':
             processes = [Process(target=sampleRandom, args=(Y, Y.shape[0])) for i in range(iter)]
 
@@ -67,8 +63,7 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
                 p.start()
             for p in processes:
                 p.join()
-            #p=Pool(processes = cores)
-            #matRand = [p.apply(sampleRandom, args=(Y, Y.shape[0])) for i in range(iter)]
+                matRand.append(p.exitcode)
 
     matRand = map(list, zip(*matRand))
     matRand = pd.DataFrame(matRand, Y['Gene symbol'])
