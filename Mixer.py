@@ -65,7 +65,7 @@ def Mixer(X, Y, cores):
     #        k = k + 1
     if __name__ == 'Mixer':
         p = Pool(processes = cores)
-        out = [p.apply(nuSvmRobust, args=(X, j, [0.25, 0.5, 0.75], 0.007)) for i, j in Yn.iteritems()]
+        out = [p.apply(nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 1)) for i, j in Yn.iteritems()]
 
     #out = [pd.apply(nuSvmRobust, args=(X, j, [0.25, 0.5, 0.75], 0.007)) for i, j in Yn.iteritems()]
     print('Processing...')
