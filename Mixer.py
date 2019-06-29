@@ -8,7 +8,8 @@ import numpy as np
 import pandas as pd
 import os
 
-import  multiprocessing
+#import  multiprocessing
+from multiprocessing import Pool, Queue 
 # from ipynb.fs.full.nuSvrR import nuSvrR
 from nuSvmRobust import nuSvmRobust
 from sklearn.preprocessing import StandardScaler
@@ -55,21 +56,26 @@ def Mixer(X, Y, cores):
 
     Yn = pd.DataFrame(scale(Y), index=Y.index, columns=Y.columns)
 
-    out = list()
-    k = 1
+    out = Queue() 
+
+    print('Processing...')
+
+    if __name__ == 'Mixer':
+        with Pool(processes=cores) as pool:
+            [pool.apply(nuSvmRobust, args=(out ,X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
+
     #for i, j in Yn.iteritems():
     #        print('--------------------------------------------------')
     #        print('Subject: ' + str(i) + ' Nro: ' + str(k))
     #        print('--------------------------------------------------')
     #        out.append(nuSvmRobust(X = X, Y = j, nuseq = [0.25,0.5,0.75], delta = 0.007))
     #        k = k + 1
-    if __name__ == 'Mixer':
-        p = multiprocessing.Pool(processes = cores)
-        out = [p.apply(nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
+    #if __name__ == 'Mixer':
+    #    p = multiprocessing.Pool(processes = cores)
+        #out = [p.apply(nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
 
     #out = [pd.apply(nuSvmRobust, args=(X, j, [0.25, 0.5, 0.75], 0.007)) for i, j in Yn.iteritems()]
-    print('Processing...')
-
+    
     print('Finish nuSvm')
 
     matWa = pd.DataFrame()
