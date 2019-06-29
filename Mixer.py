@@ -9,7 +9,7 @@ import pandas as pd
 import os
 
 #import  multiprocessing
-from multiprocessing import Process
+from multiprocessing import Process, Pipe
 # from ipynb.fs.full.nuSvrR import nuSvrR
 from nuSvmRobust import nuSvmRobust
 from sklearn.preprocessing import StandardScaler
@@ -51,17 +51,20 @@ def Mixer(X, Y, cores):
     Yn = pd.DataFrame(scale(Y), index=Y.index, columns=Y.columns)
 
     out = list()
+    pipe_list = []
     print('Processing...')
 
-    if __name__ == 'Mixer':
+    if __name__ == 'Mixer':        
         processes = [Process(target=nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 1)) for i, j in Yn.iteritems()]
 
         for p in processes:
+            recv_end, send_end = Pipe(False)
             p.start()
+            pipe_list.append(recv_end)
 
         for p in processes:
             p.join()
-            out.append(p.exitcode)
+            out = [x.recv() for x in pipe_list]
     
     print('Finish nuSvm')
 

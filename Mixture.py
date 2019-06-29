@@ -4,15 +4,15 @@
 import pandas as pd
 import numpy as np
 import os
-from multiprocessing import Pool
+from multiprocessing import Pool, Pipe
 from Mixer import Mixer
 import random
 
-def sampleRandom (Y, n):
+def sampleRandom (Y, n, send_end):
     Y = Y.iloc[:, 1:]
     vector = Y.to_numpy(copy=True)
     vector = vector.flatten()
-    exit(vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]])
+    send_end.send(vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]])
 
 def getPValues (x, i):
     return pd.DataFrame([sum(i.loc[:,'RMSEa'] < x.RMSEa),
@@ -55,15 +55,19 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
     orig.ACCmetrix[0] = pd.concat([orig.ACCmetrix[0], temp], sort = False, axis = 1) 
   
     matRand = list()
+    pipe_list = []
 
     if __name__ == 'Mixture':
             processes = [Process(target=sampleRandom, args=(Y, Y.shape[0])) for i in range(iter)]
 
             for p in processes:
+                recv_end, send_end = Pipe(False)
                 p.start()
+                pipe_list.append(recv_end)
+
             for p in processes:
                 p.join()
-                matRand.append(p.exitcode)
+                matRand = [x.recv() for x in pipe_list]
 
     matRand = map(list, zip(*matRand))
     matRand = pd.DataFrame(matRand, Y['Gene symbol'])

@@ -11,10 +11,6 @@ import multiprocessing
 # from ipynb.fs.full.tuneSvmForDeconv import tuneSvmForDeconv
 from tuneSvmForDeconv import tuneSvmForDeconv
 
-
-# In[2]:
-
-
 # Function nuSvmRobust
 # ----------------
 # @method nuSvmRobust
@@ -23,7 +19,7 @@ from tuneSvmForDeconv import tuneSvmForDeconv
 # @param [array] nuseq
 # @param [float] delta
 # @return -------------
-def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6, verbose = 0):
+def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6, verbose = 0, send_end):
 
     wSel = [1 for x in range(len(X.columns))]
     wSel = pd.DataFrame(wSel, X.columns).T
@@ -103,4 +99,4 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
     #w = w.where(w>delta).fillna(0).round(1)
 
     result = pd.Series([wSel, w, nusvm, nusvmW, corrv, corrvW, model.get_params()['nu'], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter'])
-    exit(result)
+    send_end.send(result)
