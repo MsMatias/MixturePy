@@ -42,8 +42,8 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
         XX = X.loc[:, X.columns.isin(wSel.columns[wSel.values[0] > 0])]
         model = tuneSvmForDeconv(X = XX, Y = Y, nuseq = [0.25,0.5,0.75], delta = 0.007)
 	
-	if verbose == 1:
-        print('Iter: ' + str(i), flush=True)
+	    if verbose == 1:
+            print('Iter: ' + str(i), flush=True)
 
         # Get betas
         w = model.coef_
