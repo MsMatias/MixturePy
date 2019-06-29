@@ -57,8 +57,12 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
     matRand = list()
 
     #matRand = [pd.apply(sampleRandom, args=(Y, Y.shape[0])) for i in range(iter)]
-    for i in range(iter):
-            matRand.append(sampleRandom(Y, Y.shape[0]))
+    #for i in range(iter):
+    #        matRand.append(sampleRandom(Y, Y.shape[0]))
+
+    if __name__ == 'Mixture':
+            p=Pool(processes = cores)
+            matRand = [p.apply(sampleRandom, args=(Y, Y.shape[0])) for i in range(iter)]
 
     matRand = map(list, zip(*matRand))
     matRand = pd.DataFrame(matRand, Y['Gene symbol'])

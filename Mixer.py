@@ -57,12 +57,15 @@ def Mixer(X, Y, cores):
 
     out = list()
     k = 1
-    for i, j in Yn.iteritems():
-            print('--------------------------------------------------')
-            print('Subject: ' + str(i) + ' Nro: ' + str(k))
-            print('--------------------------------------------------')
-            out.append(nuSvmRobust(X = X, Y = j, nuseq = [0.25,0.5,0.75], delta = 0.007))
-            k = k + 1
+    #for i, j in Yn.iteritems():
+    #        print('--------------------------------------------------')
+    #        print('Subject: ' + str(i) + ' Nro: ' + str(k))
+    #        print('--------------------------------------------------')
+    #        out.append(nuSvmRobust(X = X, Y = j, nuseq = [0.25,0.5,0.75], delta = 0.007))
+    #        k = k + 1
+    if __name__ == 'Mixer':
+        p = Pool(processes = cores)
+        out = [p.apply(nuSvmRobust, args=(X, j, [0.25, 0.5, 0.75], 0.007)) for i, j in Yn.iteritems()]
 
     #out = [pd.apply(nuSvmRobust, args=(X, j, [0.25, 0.5, 0.75], 0.007)) for i, j in Yn.iteritems()]
     print('Processing...')
