@@ -7,7 +7,7 @@ from __future__ import print_function
 import numpy as np
 import pandas as pd
 import os, math
-
+import multiprocessing
 # from ipynb.fs.full.tuneSvmForDeconv import tuneSvmForDeconv
 from tuneSvmForDeconv import tuneSvmForDeconv
 
@@ -32,17 +32,19 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
     model = 0
 
     if verbose == 1:
+	print('--------------------------------------------------')
+	print('Number of Processor: ' + multiprocessing.current_process())
         print('--------------------------------------------------')
         print('Subject: ' + str(subject))
         print('--------------------------------------------------')
-    
+
     while ok:
         i = i + 1
         # Run function
         XX = X.loc[:, X.columns.isin(wSel.columns[wSel.values[0] > 0])]
         model = tuneSvmForDeconv(X = XX, Y = Y, nuseq = [0.25,0.5,0.75], delta = 0.007)
 	
-	    if verbose == 1:
+        if verbose == 1:
             print('Iter: ' + str(i), flush=True)
 
         # Get betas
