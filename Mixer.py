@@ -66,7 +66,7 @@ def Mixer(X, Y, cores):
         for p in processes:
             p.join()
 
-        out = [x.recv() for x in pipe_list]
+    out = [x.recv() for x in pipe_list]
     
     print('Finish nuSvm')
 
