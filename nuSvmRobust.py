@@ -74,7 +74,7 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
         else:
             ok = False
         
-        if i >= maxIter:
+        if i >= maxIter and i > -1:
             ok = False
 
     wOut = pd.DataFrame(wAbs[0], XX.columns).T

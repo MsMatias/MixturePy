@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# ---------------------------------------------------
+# -------------------- WARNING ----------------------
+# ---------------------------------------------------
+# Do you need run this commands:
+# unlimit -n 8192
+# sudo sysctl -w fs.file-max=100000
+
+
 import pandas as pd
 import numpy as np
 import os

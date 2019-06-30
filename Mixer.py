@@ -58,7 +58,7 @@ def Mixer(X, Y, cores):
     if __name__ == 'Mixer':
         for i, j in Yn.iteritems():
             recv_end, send_end = Pipe(False)
-            p = Process(target=nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, 6, 0, send_end))
+            p = Process(target=nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, -1, 0, send_end))
             processes.append(p)
             p.start()
             pipe_list.append(recv_end)
@@ -67,9 +67,9 @@ def Mixer(X, Y, cores):
             p.join()
 
     out = [x.recv() for x in pipe_list]
-    
+
     print('_____________________________________________________________________')
-    print(out)
+    # print(out)
     print('_____________________________________________________________________')
     
     print('Finish nuSvm')
