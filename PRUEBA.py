@@ -14,8 +14,6 @@ import numpy as np
 import os
 import sys
 from Mixture import Mixture
-from IPython.core.interactiveshell import InteractiveShell
-InteractiveShell.ast_node_interactivity = "all"
 
 if len(sys.argv) < 2:
 	print('Write first the dataset and output name file')
@@ -27,4 +25,5 @@ X = pd.read_excel('LM22Signature.xlsx', sheet_name = 0)
 Y = pd.read_excel(sys.argv[1] + '.xlsx', sheet_name = 0)
 
 # Run Mixer Function
-data = Mixture(X, Y , 4, 10, sys.argv[2])
+if __name__ == '__main__':
+	data = Mixture(X, Y , 4, 2, sys.argv[2])

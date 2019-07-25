@@ -28,6 +28,17 @@ def generateXlsx (result, pValues, nameFile):
         result.usedGenes[0].to_excel(writer, sheet_name='UsedGenes')
         pValues.to_excel(writer, sheet_name='Pvalues')
 
+def generateXlsx2 (result, nameFile):
+    with pd.ExcelWriter( nameFile + '.xlsx') as writer:
+        result.Subjects[0].MIXabs[0].to_excel(writer, sheet_name='Absolute')
+        result.Subjects[0].MIXprop[0].to_excel(writer, sheet_name='Proportions')
+        result.Subjects[0].ACCmetrix[0].to_excel(writer, sheet_name='Metrics')
+        result.usedGenes[0].to_excel(writer, sheet_name='UsedGenes')
+
+def generateXlsx3 (result, nameFile):
+    with pd.ExcelWriter( nameFile + '.xlsx') as writer:
+        result.to_excel(writer, sheet_name='hoja1')
+
 def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
 
     # Intersection between X and Y
@@ -36,8 +47,6 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
     print('Running mixer with subjects (Count: ' + str(Y.shape[1]) + ')...')
     # Run Mixer Function with original Expressions
     orig = Mixer(X, Y , cores)
-
-    print(orig)
 
     print('Finish mixer')
     
@@ -89,15 +98,15 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
     result.usedGenes[0] = pd.DataFrame(result.usedGenes[0])
 
     pValues = list()
-
+    
     pValues = result.Subjects[0].ACCmetrix[0].apply(getPValues, args=(result.PermutedMetrix[0], ), axis = 1)
     pValues = pd.DataFrame(pValues.values.tolist(), index = pValues.index, columns=['RMSEa', 'RMSEa', 'Ra', 'Rp']) 
-
+    
     print('Finish')
 
     generateXlsx (result, pValues, nameFile)
 
-    return result, pValues
+    return 'hola'
 
 
 
