@@ -6,10 +6,18 @@
 from __future__ import print_function
 import numpy as np
 import pandas as pd
-import os, math
+import os, math, sys
 import multiprocessing
 # from ipynb.fs.full.tuneSvmForDeconv import tuneSvmForDeconv
 from tuneSvmForDeconv import tuneSvmForDeconv
+
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_colwidth', -1)
+
+def generateXlsx (result, nameFile):
+    with pd.ExcelWriter( nameFile + '.xlsx') as writer:
+        result.to_excel(writer, sheet_name='hoja1')
 
 # Function nuSvmRobust
 # ----------------
@@ -27,6 +35,8 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
     i = 0
     model = 0
 
+    salida = list()
+
     if verbose == 1:
         print('--------------------------------------------------')
         print('Subject: ' + str(subject) + ' Nro. Processor: ' + str(multiprocessing.current_process()))
@@ -36,8 +46,11 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
         i = i + 1
         # Run function
         XX = X.loc[:, X.columns.isin(wSel.columns[wSel.values[0] > 0])]
-        model = tuneSvmForDeconv(X = XX, Y = Y, nuseq = [0.25,0.5,0.75], delta = 0.007)
-	
+        r, model = tuneSvmForDeconv(X = XX, Y = Y.values, nuseq = [0.25,0.5,0.75], delta = 0.007)
+
+        if i == 1:
+            salida.append(r)
+        
         if verbose == 1:
             print('Iter: ' + str(i), flush=True)
 
@@ -79,24 +92,32 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
 
     wOut = pd.DataFrame(wAbs[0], XX.columns).T
 
+    #generateXlsx(pd.DataFrame(salida), str(subject))
+    #generateXlsx(X, str(subject) + 'X')
+    #generateXlsx(Y, str(subject) + 'Y')
+
     # Create wSel with all values in zero
     wSel = [0 for x in range(len(X.columns))]
     wSel = pd.DataFrame(wSel, X.columns).T
     wSel.loc[:, wSel.columns.isin(wOut.columns)] = wOut
 
-    u = X.apply(lambda x: x * wSel.iloc[0], axis = 1)
-    k = u.sum(axis = 1, skipna = True)
-    nusvm = math.sqrt(pow((k - Y),2).mean())
-    corrv = k.corr(Y)
+    u = X.apply(lambda x: x * wSel.iloc[0], axis = 1).values
+    k = np.sum(u, axis = 1)
+    #k = u.sum(axis = 1, skipna = True)
+    nusvm = math.sqrt(pow((k - Y.values),2).mean())
+    corrv = np.corrcoef(k, Y.values)
+    #corrv = k.corr(Y.values)
 
     w = wSel/wSel.sum().sum()
-    uW = X.apply(lambda x: x * w.iloc[0], axis = 1)
-    kW = uW.sum(axis = 1, skipna = True)
-    nusvmW = math.sqrt(pow((kW - Y),2).mean())
-    corrvW = kW.corr(Y)
+    uW = X.apply(lambda x: x * w.iloc[0], axis = 1).values
+    kW = np.sum(uW, axis = 1)
+    #kW = uW.sum(axis = 1, skipna = True)
+    nusvmW = math.sqrt(pow((kW - Y.values),2).mean())
+    corrvW = np.corrcoef(kW, Y.values)
+    #corrvW = kW.corr(Y.values)
 
     #wSel = wSel.where(wSel>delta).fillna(0)
     #w = w.where(w>delta).fillna(0).round(1)
 
-    result = pd.Series([wSel, w, nusvm, nusvmW, corrv, corrvW, model.get_params()['nu'], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter'])
+    result = pd.Series([wSel, w, nusvm, nusvmW, corrv[0][1], corrvW[0][1], model.get_params()['nu'], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter'])
     send_end.send(result)

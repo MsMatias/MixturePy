@@ -15,9 +15,9 @@ from nuSvmRobust import nuSvmRobust
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import scale
 
-
-# In[2]:
-
+def generateXlsx (result, nameFile):
+    with pd.ExcelWriter( nameFile + '.xlsx') as writer:
+        result.to_excel(writer, sheet_name='hoja1')
 
 # Function Mixer
 # Main Function
@@ -49,6 +49,8 @@ def Mixer(X, Y, cores):
     X.reset_index(drop=True, inplace=True)
     
     Yn = pd.DataFrame(scale(Y), index=Y.index, columns=Y.columns)
+    
+    # os.system("PAUSE")
 
     out = list()
     processes = []
