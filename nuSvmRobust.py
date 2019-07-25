@@ -15,10 +15,6 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_colwidth', -1)
 
-def generateXlsx (result, nameFile):
-    with pd.ExcelWriter( nameFile + '.xlsx') as writer:
-        result.to_excel(writer, sheet_name='hoja1')
-
 # Function nuSvmRobust
 # ----------------
 # @method nuSvmRobust
@@ -91,10 +87,6 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
             ok = False
 
     wOut = pd.DataFrame(wAbs[0], XX.columns).T
-
-    #generateXlsx(pd.DataFrame(salida), str(subject))
-    #generateXlsx(X, str(subject) + 'X')
-    #generateXlsx(Y, str(subject) + 'Y')
 
     # Create wSel with all values in zero
     wSel = [0 for x in range(len(X.columns))]

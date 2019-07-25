@@ -24,20 +24,9 @@ def generateXlsx (result, pValues, nameFile):
     with pd.ExcelWriter( nameFile + '.xlsx') as writer:
         result.Subjects[0].MIXabs[0].to_excel(writer, sheet_name='Absolute')
         result.Subjects[0].MIXprop[0].to_excel(writer, sheet_name='Proportions')
-        result.Subjects[0].ACCmetrix[0].to_excel(writer, sheet_name='Metrics')
-        result.usedGenes[0].to_excel(writer, sheet_name='UsedGenes')
+        result.Subjects[0].ACCmetrix[0].to_excel(writer, sheet_name='Metrics')        
         pValues.to_excel(writer, sheet_name='Pvalues')
-
-def generateXlsx2 (result, nameFile):
-    with pd.ExcelWriter( nameFile + '.xlsx') as writer:
-        result.Subjects[0].MIXabs[0].to_excel(writer, sheet_name='Absolute')
-        result.Subjects[0].MIXprop[0].to_excel(writer, sheet_name='Proportions')
-        result.Subjects[0].ACCmetrix[0].to_excel(writer, sheet_name='Metrics')
         result.usedGenes[0].to_excel(writer, sheet_name='UsedGenes')
-
-def generateXlsx3 (result, nameFile):
-    with pd.ExcelWriter( nameFile + '.xlsx') as writer:
-        result.to_excel(writer, sheet_name='hoja1')
 
 def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
 
