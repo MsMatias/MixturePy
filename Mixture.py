@@ -37,11 +37,10 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
     # Run Mixer Function with original Expressions
     orig = Mixer(X, Y , cores)
 
-    print(orig)
-
     print('Finish mixer')
     
     print('Get Medias')
+    
     # Get Media by subject
     totalMediaBySubject = Y.median(axis = 0, skipna = True)
 
