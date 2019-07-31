@@ -15,10 +15,6 @@ from nuSvmRobust import nuSvmRobust
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import scale
 
-
-# In[2]:
-
-
 # Function Mixer
 # Main Function
 # @method Mixer

@@ -24,9 +24,9 @@ def generateXlsx (result, pValues, nameFile):
     with pd.ExcelWriter( nameFile + '.xlsx') as writer:
         result.Subjects[0].MIXabs[0].to_excel(writer, sheet_name='Absolute')
         result.Subjects[0].MIXprop[0].to_excel(writer, sheet_name='Proportions')
-        result.Subjects[0].ACCmetrix[0].to_excel(writer, sheet_name='Metrics')
-        result.usedGenes[0].to_excel(writer, sheet_name='UsedGenes')
+        result.Subjects[0].ACCmetrix[0].to_excel(writer, sheet_name='Metrics')        
         pValues.to_excel(writer, sheet_name='Pvalues')
+        result.usedGenes[0].to_excel(writer, sheet_name='UsedGenes')
 
 def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
 
@@ -88,15 +88,15 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
     result.usedGenes[0] = pd.DataFrame(result.usedGenes[0])
 
     pValues = list()
-
+    
     pValues = result.Subjects[0].ACCmetrix[0].apply(getPValues, args=(result.PermutedMetrix[0], ), axis = 1)
     pValues = pd.DataFrame(pValues.values.tolist(), index = pValues.index, columns=['RMSEa', 'RMSEa', 'Ra', 'Rp']) 
-
+    
     print('Finish')
 
     generateXlsx (result, pValues, nameFile)
 
-    return result, pValues
+    return 'hola'
 
 
 

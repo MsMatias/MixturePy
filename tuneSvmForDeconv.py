@@ -3,7 +3,7 @@
 
 import numpy as np
 import pandas as pd
-import os, math
+import os, math, sys
 
 from sklearn.svm import NuSVR
 
@@ -15,9 +15,10 @@ from sklearn.svm import NuSVR
 # @param [float] nu
 # @param [float] delta
 # @return [Array] [{ float } RMSEpredict, { objet } model]
-def nuSvr(X, Y, nu, delta):
+def nuSvr(X, Y, nu, delta, verbose = False):
+
     # Run NuSVR
-    clf = NuSVR(kernel='linear', C=1.0, nu=nu)
+    clf = NuSVR(kernel='linear', C=1.0, nu=nu, verbose = verbose)
     clf.fit(X, Y)
     
     # Get betas
@@ -35,7 +36,7 @@ def nuSvr(X, Y, nu, delta):
     # Product betas per rows X
     neww = X.apply(lambda row: row*w[0], axis=1)# Get Predict
     predict = neww.sum(axis=1)
-    
+
     # Get Rmse predict for nuseq
     RmsePredict = math.sqrt(pow((Y - predict),2).mean())
     return [RmsePredict, clf]
@@ -48,10 +49,10 @@ def nuSvr(X, Y, nu, delta):
 # @param [array] nuseq
 # @param [float] delta
 # @return [DataFrame] [RMSEpredict, model]
-def tuneSvmForDeconv(X, Y, nuseq, delta):
-    result = list(map(lambda nu: nuSvr(X,Y, nu, delta), nuseq))
+def tuneSvmForDeconv(X, Y, nuseq, delta, verbose = False):
+    result = list(map(lambda nu: nuSvr(X,Y, nu, delta, verbose), nuseq))
     listNuSvr = pd.DataFrame(result, columns=['RMSEpred', 'model'])
     
     # Get min RMSEPredict
     selector = listNuSvr.index[listNuSvr['RMSEpred'] == listNuSvr.min(axis = 0)[0]]
-    return listNuSvr.iloc[selector[0]]['model']
+    return listNuSvr, listNuSvr.iloc[selector[0]]['model']
