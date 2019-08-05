@@ -74,9 +74,9 @@ def Mixer(X, Y, cores):
     matRes = pd.DataFrame()
 
     while not q.empty():
-        matWa = matWa.append(q.Wa, ignore_index=True)
-        matWp = matWp.append(q.Wp, ignore_index=True)
-        matRes = matRes.append(pd.DataFrame([[q.RMSEa, q.RMSEp, q.Ra, q.Rp,  q.BestParams, q.Iter]], columns=['RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter']), ignore_index=True)
+        matWa = matWa.append(q.get().Wa, ignore_index=True)
+        matWp = matWp.append(q.get().Wp, ignore_index=True)
+        matRes = matRes.append(pd.DataFrame([[q.get().RMSEa, q.get().RMSEp, q.get().Ra, q.get().Rp,  q.get().BestParams, q.get().Iter]], columns=['RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter']), ignore_index=True)
   
     matWa.index = Y.columns.values
     matWa.columns = X.columns.values
