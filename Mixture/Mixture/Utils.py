@@ -2,11 +2,11 @@ import pandas as pd
 import numpy as np
 import random
 
-def sampleRandom (Y, n, send_end):
+def sampleRandom (Y, n, q):
     Y = Y.iloc[:, 1:]
     vector = Y.to_numpy(copy=True)
     vector = vector.flatten()
-    send_end.send(vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]])
+    q.put(vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]])
 
 def getPValues (x, i):
     return pd.DataFrame([sum(i.loc[:,'RMSEa'] < x.RMSEa),

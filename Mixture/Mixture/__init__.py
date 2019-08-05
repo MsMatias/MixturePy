@@ -4,7 +4,7 @@
 import pandas as pd
 import numpy as np
 import os
-from multiprocessing import Process, Pipe
+from multiprocessing import Process, SimpleQueue
 from Mixture import Mixer, Utils
 
 def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
@@ -34,21 +34,22 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
   
     matRand = list()
     processes = list()
-    pipe_list = list()
+    matRand = []
 
     print('Creating population (Count: ' + str(iter) + ')...')
     if __name__ == 'Mixture':
+            q = SimpleQueue()
             for i in range(iter):
-                    recv_end, send_end = Pipe(False)
-                    p = Process(target=Utils.sampleRandom, args=(Y, Y.shape[0], send_end))
+                    p = Process(target=Utils.sampleRandom, args=(Y, Y.shape[0], q))
                     processes.append(p)
-                    p.start()
-                    pipe_list.append(recv_end)                
+                    p.start()            
 
             for p in processes:
                 p.join()
 
-    matRand = [x.recv() for x in pipe_list]
+            while not q.empty():
+                matRand.append(q.get())
+    #matRand = [x.recv() for x in pipe_list]
 
     matRand = map(list, zip(*matRand))
     matRand = pd.DataFrame(matRand, Y['Gene symbol'])
