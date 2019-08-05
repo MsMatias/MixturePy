@@ -39,7 +39,8 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
     print('Creating population (Count: ' + str(iter) + ')...')
     if __name__ == 'Mixture':
             with Pool(cores) as pool:
-                matRand = pool.starmap(Utils.sampleRandom, product(Y, Y.shape[0], 1))
+                func = Utils.sampleRandom(Y, Y.shape[0], 1)
+                matRand = pool.map(func)
 
     #matRand = [x.recv() for x in pipe_list]
 
