@@ -19,7 +19,7 @@ def sampleRandom (Y, n, q, i, verbose = 0):
         print('Finish Creating Subject: ' + str(i) + ' Nro. Processor: ' + str(multiprocessing.current_process()))
         print('--------------------------------------------------')
 
-    q.put(vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]])
+    q.put(vector)
 
 def getPValues (x, i):
     return pd.DataFrame([sum(i.loc[:,'RMSEa'] < x.RMSEa),
