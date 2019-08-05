@@ -6,7 +6,7 @@ import pandas as pd
 import os
 
 #import  multiprocessing
-from multiprocessing import Process, SimpleQueue
+from multiprocessing import Process, Queue
 # from ipynb.fs.full.nuSvrR import nuSvrR
 from Mixture import nuSvmRobust
 from sklearn.preprocessing import StandardScaler
@@ -49,14 +49,16 @@ def Mixer(X, Y, cores):
     print('Processing...')
 
     if __name__ == 'Mixture.Mixer':
-        q = SimpleQueue()
+        q = Queue()
         for i, j in Yn.iteritems():
             p = Process(target=nuSvmRobust.nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, -1, 1, q))            
             processes.append(p)
-            p.start()      
+            p.start() 
+            q.close()     
 
         for p in processes:
             p.join()
+            q.join_thread()
 
     #out = [x.recv() for x in pipe_list]
 

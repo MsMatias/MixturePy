@@ -4,7 +4,7 @@
 import pandas as pd
 import numpy as np
 import os
-from multiprocessing import Process, SimpleQueue
+from multiprocessing import Process, Queue
 from Mixture import Mixer, Utils
 
 def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
@@ -38,14 +38,16 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
     print('Creating population (Count: ' + str(iter) + ')...')
     if __name__ == 'Mixture':
-            q = SimpleQueue()
+            q = Queue()
             for i in range(iter):
                     p = Process(target=Utils.sampleRandom, args=(Y, Y.shape[0], q, i, 1))
                     processes.append(p)
-                    p.start()            
+                    p.start()
+                    q.close()            
 
             for p in processes:
                 p.join()
+                q.join_thread()
 
             while not q.empty():
                 out = q.get()
