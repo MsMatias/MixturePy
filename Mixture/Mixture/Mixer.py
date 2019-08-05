@@ -54,16 +54,12 @@ def Mixer(X, Y, cores):
     if __name__ == 'Mixture.Mixer':
         q = SimpleQueue()
         for i, j in Yn.iteritems():
-            p = Process(target=nuSvmRobust.nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, -1, 0, q))            
+            p = Process(target=nuSvmRobust.nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, -1, 1, q))            
             processes.append(p)
             p.start()      
 
         for p in processes:
             p.join()
-
-
-        while not q.empty():
-            print(q.get())
 
     #out = [x.recv() for x in pipe_list]
 
@@ -77,10 +73,10 @@ def Mixer(X, Y, cores):
     matWp = pd.DataFrame()
     matRes = pd.DataFrame()
 
-    for i in out:
-        matWa = matWa.append(i.Wa, ignore_index=True)
-        matWp = matWp.append(i.Wp, ignore_index=True)
-        matRes = matRes.append(pd.DataFrame([[i.RMSEa, i.RMSEp, i.Ra, i.Rp,  i.BestParams, i.Iter]], columns=['RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter']), ignore_index=True)
+    while not q.empty():
+        matWa = matWa.append(q.Wa, ignore_index=True)
+        matWp = matWp.append(q.Wp, ignore_index=True)
+        matRes = matRes.append(pd.DataFrame([[q.RMSEa, q.RMSEp, q.Ra, q.Rp,  q.BestParams, q.Iter]], columns=['RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter']), ignore_index=True)
   
     matWa.index = Y.columns.values
     matWa.columns = X.columns.values
