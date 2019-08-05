@@ -1,10 +1,17 @@
 import pandas as pd
 import numpy as np
 import random
+import multiprocessing
 
-def sampleRandom (Y, n, q):
+def sampleRandom (Y, n, q, i, verbose = 0):
+        
+    if verbose == 1:
+        print('--------------------------------------------------')
+        print('Creating Subject: ' + str(i) + ' Nro. Processor: ' + str(multiprocessing.current_process()))
+        print('--------------------------------------------------')
+
     Y = Y.iloc[:, 1:]
-    vector = Y.to_numpy(copy=True)
+    vector = Y.to_numpy(copy=True)    
     vector = vector.flatten()
     q.put(vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]])
 

@@ -40,7 +40,7 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
     if __name__ == 'Mixture':
             q = SimpleQueue()
             for i in range(iter):
-                    p = Process(target=Utils.sampleRandom, args=(Y, Y.shape[0], q))
+                    p = Process(target=Utils.sampleRandom, args=(Y, Y.shape[0], q, i, 1))
                     processes.append(p)
                     p.start()            
 
