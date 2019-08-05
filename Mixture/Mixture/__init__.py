@@ -50,6 +50,13 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
     #matRand = [x.recv() for x in pipe_list]
 
+    while True:
+        try:
+            out = q.get_nowait()
+            matRand.append(out)
+        except queue.Empty:
+            break
+
     matRand = map(list, zip(*matRand))
     matRand = pd.DataFrame(matRand, Y['Gene symbol'])
     matRand.reset_index(drop=True, inplace=True)
