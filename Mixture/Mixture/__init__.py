@@ -47,9 +47,13 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
             for p in processes:
                 p.join()
 
-            while not q.empty():
-                out = q.get()
-                matRand.append(out)
+            while True:
+                try:
+                    out = q.get_nowait()
+                    matRand.append(out)
+                except queue.Empty:
+                    break
+                    
     #matRand = [x.recv() for x in pipe_list]
 
     matRand = map(list, zip(*matRand))
