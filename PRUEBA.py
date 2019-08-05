@@ -5,7 +5,7 @@
 # -------------------- WARNING ----------------------
 # ---------------------------------------------------
 # Do you need run this commands:
-# unlimit -n 8192
+# ulimit -n 8192
 # sudo sysctl -w fs.file-max=100000
 
 
@@ -13,17 +13,23 @@ import pandas as pd
 import numpy as np
 import os
 import sys
-from Mixture import Mixture
+import Mixture
 
-if len(sys.argv) < 2:
+if len(sys.argv) < 5:
 	print('Write first the dataset and output name file')
-	print('Example: TCGA output_TCGA')
+	print('Example: [num cores] [iterators] [signature file] [expression file] [output file]')	
 	sys.exit()
+	
+cores = int(sys.argv[1])
+iters = int(sys.argv[2])
+signature = sys.argv[3]
+expression = sys.argv[4]
+output = sys.argv[5]
 
 # Read xlsx files
-X = pd.read_excel('LM22Signature.xlsx', sheet_name = 0)
-Y = pd.read_excel(sys.argv[1] + '.xlsx', sheet_name = 0)
+X = pd.read_excel(signature + '.xlsx', sheet_name = 0)
+Y = pd.read_excel(expression + '.xlsx', sheet_name = 0)
 
 # Run Mixer Function
 if __name__ == '__main__':
-	data = Mixture(X, Y , 4, 2, sys.argv[2])
+	data = Mixture.Mixture(X, Y , cores, iters, output)
