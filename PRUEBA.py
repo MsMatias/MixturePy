@@ -5,7 +5,7 @@
 # -------------------- WARNING ----------------------
 # ---------------------------------------------------
 # Do you need run this commands:
-# unlimit -n 8192
+# ulimit -n 8192
 # sudo sysctl -w fs.file-max=100000
 
 
