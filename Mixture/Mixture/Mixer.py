@@ -52,7 +52,7 @@ def Mixer(X, Y, cores):
     print('Processing...')
 
     if __name__ == 'Mixture.Mixer':
-        q = queues.SimpleQueue
+        q = queues.SimpleQueue()
         for i, j in Yn.iteritems():
             p = Process(target=nuSvmRobust.nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, -1, 0, q))            
             processes.append(p)
