@@ -13,7 +13,11 @@ def sampleRandom (Y, i, verbose = 0):
     Y = Y.iloc[:, 1:]
     vector = Y.to_numpy(copy=True)    
 
-    return vector[[random.randrange(len(vector)) for x in range(len(vector))]]
+    out = vector[[random.randrange(len(vector)) for x in range(len(vector))]]
+
+    print(out)
+
+    return out
 
 def getPValues (x, i):
     return pd.DataFrame([sum(i.loc[:,'RMSEa'] < x.RMSEa),

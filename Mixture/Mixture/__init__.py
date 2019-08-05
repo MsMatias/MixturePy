@@ -40,12 +40,12 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
     for i in range(iter):
         matRand.append(Utils.sampleRandom(Y, i, 1))
 
-    print(matRand)
-
     matRand = map(list, zip(*matRand))
     matRand = pd.DataFrame(matRand, Y['Gene symbol'])
     matRand.reset_index(drop=True, inplace=True)
     matRand = pd.concat([Y['Gene symbol'], matRand], sort = False, axis = 1)
+
+    print(matRand)
 
     print('Finish')
 
