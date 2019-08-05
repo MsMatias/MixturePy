@@ -9,7 +9,7 @@ import pandas as pd
 import os, math, sys
 import multiprocessing
 # from ipynb.fs.full.tuneSvmForDeconv import tuneSvmForDeconv
-from tuneSvmForDeconv import tuneSvmForDeconv
+from Mixture import tuneSvmForDeconv
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
@@ -33,6 +33,8 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
 
     salida = list()
 
+    np.seterr(divide='ignore', invalid='ignore')
+
     if verbose == 1:
         print('--------------------------------------------------')
         print('Subject: ' + str(subject) + ' Nro. Processor: ' + str(multiprocessing.current_process()))
@@ -42,7 +44,7 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
         i = i + 1
         # Run function
         XX = X.loc[:, X.columns.isin(wSel.columns[wSel.values[0] > 0])]
-        r, model = tuneSvmForDeconv(X = XX, Y = Y.values, nuseq = [0.25,0.5,0.75], delta = 0.007)
+        r, model = tuneSvmForDeconv.tuneSvmForDeconv(X = XX, Y = Y.values, nuseq = [0.25,0.5,0.75], delta = 0.007)
 
         if i == 1:
             salida.append(r)

@@ -3,21 +3,18 @@
 
 import pandas as pd
 import numpy as np
-import random
 import os
 from multiprocessing import Process, Pipe
-from Mixer import Mixer
-from Utils import sampleRandom, getPValues, generateXlsx
+from Mixture import Mixer, Utils
 
-
-def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
+def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
     # Intersection between X and Y
     geneList = X.loc[X['Gene symbol'].isin(Y['Gene symbol'])].sort_values(by=['Gene symbol'])['Gene symbol']
 
     print('Running mixer with subjects (Count: ' + str(Y.shape[1]) + ')...')
     # Run Mixer Function with original Expressions
-    orig = Mixer(X, Y , cores)
+    orig = Mixer.Mixer(X, Y, cores)
 
     print('Finish mixer')
     
@@ -38,10 +35,11 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
     pipe_list = []
     processes = []
 
+    print('Creating population (Count: ' + str(iter) + ')...')
     if __name__ == 'Mixture':
             for i in range(iter):
                     recv_end, send_end = Pipe(False)
-                    p = Process(target=sampleRandom, args=(Y, Y.shape[0], send_end))
+                    p = Process(target=Utils.sampleRandom, args=(Y, Y.shape[0], send_end))
                     processes.append(p)
                     p.start()
                     pipe_list.append(recv_end)                
@@ -60,7 +58,7 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
 
     print('Running mixer with porpulationBased (Count: ' + str(matRand.shape[1]) + ')')
     # Run Mixer Function with Random Matrix
-    outMix = Mixer(X, matRand, cores)
+    outMix = Mixer.Mixer(X, matRand, cores)
 
     #geneList = pd.DataFrame(geneList)
 
@@ -70,12 +68,12 @@ def Mixture (X, Y, cores, iter = 100, nameFile = 'output'):
 
     pValues = list()
     
-    pValues = result.Subjects[0].ACCmetrix[0].apply(getPValues, args=(result.PermutedMetrix[0], ), axis = 1)
+    pValues = result.Subjects[0].ACCmetrix[0].apply(Utils.getPValues, args=(result.PermutedMetrix[0], ), axis = 1)
     pValues = pd.DataFrame(pValues.values.tolist(), index = pValues.index, columns=['RMSEa', 'RMSEa', 'Ra', 'Rp']) 
     
     print('Finish')
 
-    generateXlsx (result, pValues, nameFile)
+    Utils.generateXlsx (result, pValues, nameFile)
 
     return 'fin'
 
