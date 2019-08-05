@@ -15,6 +15,11 @@ def sampleRandom (Y, n, q, i, verbose = 0):
     vector = vector.flatten()
     q.put(vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]])
 
+    if verbose == 1:
+        print('--------------------------------------------------')
+        print('Finish Creating Subject: ' + str(i) + ' Nro. Processor: ' + str(multiprocessing.current_process()))
+        print('--------------------------------------------------')
+
 def getPValues (x, i):
     return pd.DataFrame([sum(i.loc[:,'RMSEa'] < x.RMSEa),
             sum(i.loc[:,'RMSEp'] < x.RMSEp), 
