@@ -10,7 +10,7 @@ def sampleRandom (Y, i, verbose = 0):
         print('Creating Subject: ' + str(i) + ' Nro. Processor: ' + str(multiprocessing.current_process()))
         print('--------------------------------------------------')
 
-    #Y = Y.iloc[:, 1:]
+    Y = Y.iloc[:, 1:]
     vector = Y.to_numpy(copy=True)    
     vector = vector.flatten()
     print('tamaño')
