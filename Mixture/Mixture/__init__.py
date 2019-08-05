@@ -42,12 +42,10 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
             for i in range(iter):
                     p = Process(target=Utils.sampleRandom, args=(Y, Y.shape[0], q, i, 1))
                     processes.append(p)
-                    p.start()
-                    q.close()            
+                    p.start()            
 
             for p in processes:
                 p.join()
-                q.join_thread()
 
             while not q.empty():
                 out = q.get()
