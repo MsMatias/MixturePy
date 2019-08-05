@@ -49,7 +49,6 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
             while not q.empty():
                 out = q.get()
-                print(out)
                 matRand.append(out)
     #matRand = [x.recv() for x in pipe_list]
 
