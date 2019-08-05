@@ -6,7 +6,6 @@ import numpy as np
 import os
 import queue
 from multiprocessing import Pool
-from itertools import product
 from Mixture import Mixer, Utils
 
 def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
@@ -35,16 +34,11 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
     orig.ACCmetrix[0] = pd.concat([orig.ACCmetrix[0], temp], sort = False, axis = 1) 
   
     matRand = list()
-    
+
     print('Creating population (Count: ' + str(iter) + ')...')
-    if __name__ == 'Mixture':
-            with Pool(cores) as pool:
-                func = Utils.sampleRandom(Y, 1)
-                matRand.append(pool.map(func))
 
-    #matRand = [x.recv() for x in pipe_list]
-
-    print(matRand)
+    for i in range(iter):
+        matRand.append(Utils.sampleRandom(Y, i, 1))
 
     matRand = map(list, zip(*matRand))
     matRand = pd.DataFrame(matRand, Y['Gene symbol'])

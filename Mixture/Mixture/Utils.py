@@ -3,17 +3,17 @@ import numpy as np
 import random
 import multiprocessing
 
-def sampleRandom (Y, verbose = 0):
+def sampleRandom (Y, i, verbose = 0):
         
     if verbose == 1:
         print('--------------------------------------------------')
-        print('Creating Subject Nro. Processor: ' + str(multiprocessing.current_process()))
+        print('Creating Subject: ' + str(i) + ' Nro. Processor: ' + str(multiprocessing.current_process()))
         print('--------------------------------------------------')
 
     Y = Y.iloc[:, 1:]
     vector = Y.to_numpy(copy=True)    
 
-    return vector
+    return vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]]
 
 def getPValues (x, i):
     return pd.DataFrame([sum(i.loc[:,'RMSEa'] < x.RMSEa),
