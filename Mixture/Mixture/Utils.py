@@ -3,7 +3,7 @@ import numpy as np
 import random
 import multiprocessing
 
-def sampleRandom (Y, n, verbose = 0):
+def sampleRandom (Y, verbose = 0):
         
     if verbose == 1:
         print('--------------------------------------------------')
