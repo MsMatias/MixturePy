@@ -45,8 +45,6 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
     matRand.reset_index(drop=True, inplace=True)
     matRand = pd.concat([Y['Gene symbol'], matRand], sort = False, axis = 1)
 
-    print(matRand)
-
     print('Finish')
 
     print('Running mixer with porpulationBased (Count: ' + str(matRand.shape[1]) + ')')
