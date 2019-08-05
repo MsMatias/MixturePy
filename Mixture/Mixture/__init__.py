@@ -47,7 +47,6 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
             for p in processes:
                 p.join()
-                p.close()
 
     matRand = [x.recv() for x in pipe_list]
 
