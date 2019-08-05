@@ -10,14 +10,10 @@ def sampleRandom (Y, i, verbose = 0):
         print('Creating Subject: ' + str(i) + ' Nro. Processor: ' + str(multiprocessing.current_process()))
         print('--------------------------------------------------')
 
-    Y = Y.iloc[:, 1:]
+    #Y = Y.iloc[:, 1:]
     vector = Y.to_numpy(copy=True)    
 
-    out = vector[[random.randrange(len(vector)) for x in range(len(vector))]]
-
-    print(out)
-
-    return out
+    return vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]]
 
 def getPValues (x, i):
     return pd.DataFrame([sum(i.loc[:,'RMSEa'] < x.RMSEa),
