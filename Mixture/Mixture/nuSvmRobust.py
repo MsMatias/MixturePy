@@ -50,7 +50,7 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
             salida.append(r)
         
         if verbose == 1:
-            print('Iter: ' + str(i), flush=True)
+            print('Iter: ' + str(i) + ' Subject: ' + str(subject), flush=True)
 
         # Get betas
         w = model.coef_

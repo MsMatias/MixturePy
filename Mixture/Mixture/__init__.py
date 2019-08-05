@@ -4,8 +4,6 @@
 import pandas as pd
 import numpy as np
 import os
-import queue
-from multiprocessing import Pool
 from Mixture import Mixer, Utils
 
 def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
@@ -39,6 +37,8 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
     for i in range(iter):
         matRand.append(Utils.sampleRandom(Y, i, 1))
+
+    print('Finish creating population')
 
     matRand = map(list, zip(*matRand))
     matRand = pd.DataFrame(matRand, Y['Gene symbol'])

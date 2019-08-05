@@ -13,11 +13,6 @@ def sampleRandom (Y, i, verbose = 0):
     Y = Y.iloc[:, 1:]
     vector = Y.to_numpy(copy=True)    
     vector = vector.flatten()
-    print('tamaño')
-    print(len(vector))
-
-    print('shape')
-    print(vector.shape)
 
     return vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]]
 
