@@ -23,7 +23,7 @@ pd.set_option('display.max_colwidth', -1)
 # @param [array] nuseq
 # @param [float] delta
 # @return -------------
-def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6, verbose = 0, send_end = ''):
+def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6, verbose = 0, q = ''):
 
     wSel = [1 for x in range(len(X.columns))]
     wSel = pd.DataFrame(wSel, X.columns).T
@@ -114,4 +114,4 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
     #w = w.where(w>delta).fillna(0).round(1)
 
     result = pd.Series([wSel, w, nusvm, nusvmW, corrv[0][1], corrvW[0][1], model.get_params()['nu'], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter'])
-    send_end.send(result)
+    q.put(result)
