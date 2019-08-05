@@ -4,6 +4,7 @@
 import pandas as pd
 import numpy as np
 import os
+import queue
 from multiprocessing import Process, Queue
 from Mixture import Mixer, Utils
 
@@ -51,7 +52,7 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
                 try:
                     out = q.get_nowait()
                     matRand.append(out)
-                except q.Empty:
+                except queue.Empty:
                     break
 
     #matRand = [x.recv() for x in pipe_list]
