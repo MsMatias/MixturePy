@@ -33,8 +33,8 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
     orig.ACCmetrix[0] = pd.concat([orig.ACCmetrix[0], temp], sort = False, axis = 1) 
   
     matRand = list()
-    pipe_list = []
-    processes = []
+    processes = list()
+    pipe_list = list()
 
     print('Creating population (Count: ' + str(iter) + ')...')
     if __name__ == 'Mixture':
@@ -47,6 +47,7 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
             for p in processes:
                 p.join()
+                p.close()
 
     matRand = [x.recv() for x in pipe_list]
 
