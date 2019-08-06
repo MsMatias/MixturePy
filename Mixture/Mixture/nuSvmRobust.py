@@ -71,11 +71,13 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
         w = pd.DataFrame(w[0], XX.columns).T
         
         # Checking if all the values are NaN
-        if w.isnull().all().all():
-            wNan = [float('NaN') for x in range(len(X.columns))]
-            wNan = pd.DataFrame(wSel, X.columns).T
+        #if w.isnull().all().all():
+        if True:
+            wNan = np.empty(len(X.columns))#[0 for x in range(len(X.columns))]
+            wNan.fill(np.nan)
+            wNan = pd.DataFrame(wNan, X.columns).T
             result = pd.Series([wNan, wNan, float('NaN'), float('NaN'), float('NaN'), float('NaN'), model.get_params()['nu'], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter'])
-            return pd.DataFrame(result)
+            return result
 
         # Checking if any value is < delta
         if w.apply(lambda x: x < delta).any().any():
