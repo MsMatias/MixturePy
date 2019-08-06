@@ -4,7 +4,9 @@
 import pandas as pd
 import numpy as np
 import os
-from Mixture import Mixer, Utils
+from Mixture.Mixer import Mixer
+import Mixture.Utils as Utils
+from joblib import Parallel, delayed
 
 def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
@@ -13,7 +15,7 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
     print('Running mixer with subjects (Count: ' + str(Y.shape[1]) + ')...')
     # Run Mixer Function with original Expressions
-    orig = Mixer.Mixer(X, Y, cores)
+    orig = Mixer(X, Y, cores)
 
     print('Finish mixer')
     
@@ -35,8 +37,10 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
     print('Creating population (Count: ' + str(iter) + ')...')
 
-    for i in range(iter):
-        matRand.append(Utils.sampleRandom(Y, i, 1))
+    matRand = Parallel(n_jobs=cores)(delayed(Utils.sampleRandom)(Y = Y, i = i, verbose = 1) for i in range(iter))
+
+    #for i in range(iter):
+    #    matRand.append(Utils.sampleRandom(Y, i, 1))
 
     print('Finish creating population')
 
@@ -49,7 +53,7 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
     print('Running mixer with porpulationBased (Count: ' + str(matRand.shape[1]) + ')')
     # Run Mixer Function with Random Matrix
-    outMix = Mixer.Mixer(X, matRand, cores)
+    outMix = Mixer(X, matRand, cores)
 
     #geneList = pd.DataFrame(geneList)
 
