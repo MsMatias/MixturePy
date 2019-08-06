@@ -71,8 +71,7 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
         w = pd.DataFrame(w[0], XX.columns).T
         
         # Checking if all the values are NaN
-        #if w.isnull().all().all():
-        if True:
+        if w.isnull().all().all():
             wNan = np.empty(len(X.columns))#[0 for x in range(len(X.columns))]
             wNan.fill(np.nan)
             wNan = pd.DataFrame(wNan, X.columns).T
