@@ -14,6 +14,7 @@ import numpy as np
 import os
 import sys
 import Mixture
+import multiprocessing
 
 if len(sys.argv) < 5:
 	print('Write first the dataset and output name file')
@@ -25,6 +26,11 @@ iters = int(sys.argv[2])
 signature = sys.argv[3]
 expression = sys.argv[4]
 output = sys.argv[5]
+
+print('Num cores: ' + str(multiprocessing.cpu_count()))
+
+if cores > multiprocessing.cpu_count():
+	cores = multiprocessing.cpu_count()
 
 # Read xlsx files
 X = pd.read_excel(signature + '.xlsx', sheet_name = 0)
