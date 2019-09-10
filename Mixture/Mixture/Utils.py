@@ -17,15 +17,6 @@ def sampleRandom (Y, i, verbose = 0):
     return vector[[random.randrange(Y.shape[0] * Y.shape[1]) for x in range(Y.shape[0])]]
 
 def getPValues (x, i):
-    print('--------------------------- x -----------------------')
-    print(x)
-    print('------------------------- i ------------------------')
-    print(i)
-    print('----------------------- result ---------------------')
-    print([sum(x.RMSEa < i.loc[:,'RMSEa']),
-    sum(x.RMSEp < i.loc[:,'RMSEp']), 
-    sum(x.Ra > i.loc[:,'Ra']), 
-    sum(x.Rp > i.loc[:,'Rp'])])
     return pd.DataFrame([sum(x.RMSEa < i.loc[:,'RMSEa']),
             sum(x.RMSEp < i.loc[:,'RMSEp']), 
             sum(x.Ra > i.loc[:,'Ra']), 

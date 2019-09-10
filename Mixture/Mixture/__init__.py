@@ -70,7 +70,7 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
     Utils.generateXlsx (result, pValues, nameFile)
 
-    return 'fin'
+    return result, pValues
 
 
 
