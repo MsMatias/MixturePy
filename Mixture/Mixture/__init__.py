@@ -4,17 +4,18 @@
 import pandas as pd
 import numpy as np
 import os
-from multiprocessing import Process, Pipe
-from Mixture import Mixer, Utils
+from Mixture.Mixer import Mixer
+import Mixture.Utils as Utils
+from joblib import Parallel, delayed
 
 def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
-
+    
     # Intersection between X and Y
     geneList = X.loc[X['Gene symbol'].isin(Y['Gene symbol'])].sort_values(by=['Gene symbol'])['Gene symbol']
 
     print('Running mixer with subjects (Count: ' + str(Y.shape[1]) + ')...')
     # Run Mixer Function with original Expressions
-    orig = Mixer.Mixer(X, Y, cores)
+    orig = Mixer(X, Y, cores)
 
     print('Finish mixer')
     
@@ -33,23 +34,15 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
     orig.ACCmetrix[0] = pd.concat([orig.ACCmetrix[0], temp], sort = False, axis = 1) 
   
     matRand = list()
-    processes = list()
-    pipe_list = list()
 
     print('Creating population (Count: ' + str(iter) + ')...')
-    if __name__ == 'Mixture':
-            for i in range(iter):
-                    recv_end, send_end = Pipe(False)
-                    p = Process(target=Utils.sampleRandom, args=(Y, Y.shape[0], send_end))
-                    processes.append(p)
-                    p.start()
-                    pipe_list.append(recv_end)                
 
-            for p in processes:
-                p.join()
-                p.close()
+    matRand = Parallel(n_jobs=cores, backend='threading')(delayed(Utils.sampleRandom)(Y = Y, i = i, verbose = 1) for i in range(iter))
 
-    matRand = [x.recv() for x in pipe_list]
+    #for i in range(iter):
+    #    matRand.append(Utils.sampleRandom(Y, i, 1))
+
+    print('Finish creating population')
 
     matRand = map(list, zip(*matRand))
     matRand = pd.DataFrame(matRand, Y['Gene symbol'])
@@ -60,7 +53,7 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
     print('Running mixer with porpulationBased (Count: ' + str(matRand.shape[1]) + ')')
     # Run Mixer Function with Random Matrix
-    outMix = Mixer.Mixer(X, matRand, cores)
+    outMix = Mixer(X, matRand, cores)
 
     #geneList = pd.DataFrame(geneList)
 
@@ -77,7 +70,7 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
     Utils.generateXlsx (result, pValues, nameFile)
 
-    return 'fin'
+    return result, pValues
 
 
 

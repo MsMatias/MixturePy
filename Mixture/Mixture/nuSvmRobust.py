@@ -23,7 +23,7 @@ pd.set_option('display.max_colwidth', -1)
 # @param [array] nuseq
 # @param [float] delta
 # @return -------------
-def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6, verbose = 0, send_end = ''):
+def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = 6, verbose = 0):
 
     wSel = [1 for x in range(len(X.columns))]
     wSel = pd.DataFrame(wSel, X.columns).T
@@ -50,7 +50,7 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
             salida.append(r)
         
         if verbose == 1:
-            print('Iter: ' + str(i), flush=True)
+            print('Iter: ' + str(i) + ' Subject: ' + str(subject), flush=True)
 
         # Get betas
         w = model.coef_
@@ -72,10 +72,11 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
         
         # Checking if all the values are NaN
         if w.isnull().all().all():
-            wNan = [float('NaN') for x in range(len(X.columns))]
-            wNan = pd.DataFrame(wSel, X.columns).T
+            wNan = np.empty(len(X.columns))#[0 for x in range(len(X.columns))]
+            wNan.fill(np.nan)
+            wNan = pd.DataFrame(wNan, X.columns).T
             result = pd.Series([wNan, wNan, float('NaN'), float('NaN'), float('NaN'), float('NaN'), model.get_params()['nu'], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter'])
-            return pd.DataFrame(result)
+            return result
 
         # Checking if any value is < delta
         if w.apply(lambda x: x < delta).any().any():
@@ -114,4 +115,4 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
     #w = w.where(w>delta).fillna(0).round(1)
 
     result = pd.Series([wSel, w, nusvm, nusvmW, corrv[0][1], corrvW[0][1], model.get_params()['nu'], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter'])
-    send_end.send(result)
+    return result

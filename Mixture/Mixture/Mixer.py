@@ -1,19 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[3]:
-
-
 import numpy as np
 import pandas as pd
 import os
 
-#import  multiprocessing
-from multiprocessing import Process, Pipe
-# from ipynb.fs.full.nuSvrR import nuSvrR
-from Mixture import nuSvmRobust
+from Mixture.nuSvmRobust import nuSvmRobust
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import scale
+from joblib import Parallel, delayed
 
 # Function Mixer
 # Main Function
@@ -47,26 +42,12 @@ def Mixer(X, Y, cores):
     Yn = pd.DataFrame(scale(Y), index=Y.index, columns=Y.columns)
 
     out = list()
-    processes = list()
-    pipe_list = list()
     print('Processing...')
 
-    if __name__ == 'Mixture.Mixer':
-        for i, j in Yn.iteritems():
-            recv_end, send_end = Pipe(False)
-            p = Process(target=nuSvmRobust.nuSvmRobust, args=(X, j, i, [0.25, 0.5, 0.75], 0.007, -1, 0, send_end))            
-            processes.append(p)
-            p.start()
-            pipe_list.append(recv_end)        
+    out = Parallel(n_jobs=cores, backend='threading')(delayed(nuSvmRobust)(X = X, Y = j, subject = i, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = -1, verbose = 1) for i, j in Yn.iteritems())
+             
+    #out = [x.recv() for x in pipe_list]
 
-        for p in processes:
-            p.join()
-            p.close()
-
-    out = [x.recv() for x in pipe_list]
-
-    print('_____________________________________________________________________')
-    # print(out)
     print('_____________________________________________________________________')
     
     print('Finish nuSvm')
