@@ -23,9 +23,10 @@ def getPValues (x, i):
             sum(x.Rp > i.loc[:,'Rp'])]).T/i.shape[0]
 
 def generateXlsx (result, pValues, nameFile):
-    with pd.ExcelWriter( nameFile + '.xlsx') as writer:
-        result.Subjects[0].MIXabs[0].to_excel(writer, sheet_name='Absolute')
-        result.Subjects[0].MIXprop[0].to_excel(writer, sheet_name='Proportions')
-        result.Subjects[0].ACCmetrix[0].to_excel(writer, sheet_name='Metrics')        
-        pValues.to_excel(writer, sheet_name='Pvalues')
-        result.usedGenes[0].to_excel(writer, sheet_name='UsedGenes')
+    if len(nameFile) > 0:
+        with pd.ExcelWriter( nameFile + '.xlsx') as writer:
+            result.Subjects[0].MIXabs[0].to_excel(writer, sheet_name='Absolute')
+            result.Subjects[0].MIXprop[0].to_excel(writer, sheet_name='Proportions')
+            result.Subjects[0].ACCmetrix[0].to_excel(writer, sheet_name='Metrics')        
+            pValues.to_excel(writer, sheet_name='Pvalues')
+            result.usedGenes[0].to_excel(writer, sheet_name='UsedGenes', index=False)

@@ -44,7 +44,7 @@ def Mixer(X, Y, cores):
     out = list()
     print('Processing...')
 
-    out = Parallel(n_jobs=cores)(delayed(nuSvmRobust)(X = X, Y = j, subject = i, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = -1, verbose = 1) for i, j in Yn.iteritems())
+    out = Parallel(n_jobs=cores, backend='threading')(delayed(nuSvmRobust)(X = X, Y = j, subject = i, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = -1, verbose = 1) for i, j in Yn.iteritems())
              
     #out = [x.recv() for x in pipe_list]
 

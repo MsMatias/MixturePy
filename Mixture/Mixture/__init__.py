@@ -9,7 +9,7 @@ import Mixture.Utils as Utils
 from joblib import Parallel, delayed
 
 def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
-
+    
     # Intersection between X and Y
     geneList = X.loc[X['Gene symbol'].isin(Y['Gene symbol'])].sort_values(by=['Gene symbol'])['Gene symbol']
 
@@ -37,7 +37,7 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
     print('Creating population (Count: ' + str(iter) + ')...')
 
-    matRand = Parallel(n_jobs=cores)(delayed(Utils.sampleRandom)(Y = Y, i = i, verbose = 1) for i in range(iter))
+    matRand = Parallel(n_jobs=cores, backend='threading')(delayed(Utils.sampleRandom)(Y = Y, i = i, verbose = 1) for i in range(iter))
 
     #for i in range(iter):
     #    matRand.append(Utils.sampleRandom(Y, i, 1))
