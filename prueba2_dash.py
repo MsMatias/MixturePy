@@ -2,6 +2,9 @@ import base64
 import datetime
 import io
 import Mixture
+import multiprocessing
+
+import numpy as np
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -9,6 +12,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
 from flask import send_file
+import plotly.graph_objects as go
 
 import pandas as pd
 
@@ -24,21 +28,26 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
+app.config['suppress_callback_exceptions'] = True
 
 app.layout = html.Div([
     html.Div([
-      html.H2('MIXTURE'),
-      html.H5('an improved algorithm for immune tumor microenvironment estimation based on gene expression data')
+      html.Img(src='assets/img/logo_mixture.png', style = {
+          'width': '300px'
+      }),
+      #html.H2('MIXTURE'),
+      html.H6('an improved algorithm for immune tumor microenvironment estimation based on gene expression data', style = {
+          'margin-top': '-20px'
+      })
     ]),
+    html.Div([
     html.Div([        
         html.P('Expression file:'),
         dcc.Upload(
             id='upload-data',
             children=html.Div([
                 'Drag and Drop or ',
-                html.A('Select File', style={
-                    'color': 'blue'
-                })
+                html.A('Select File')
             ]), style={
                 'width': '100%',
                 'height': '60px',
@@ -62,7 +71,7 @@ app.layout = html.Div([
             ],
             value='LM22'
         ),
-        html.P('Population quantity:', style={
+        html.P('Number of permutation samples:', style={
             'margin-top': '10px'
         }),
         dcc.Input(
@@ -72,22 +81,61 @@ app.layout = html.Div([
             min='1',
             value=''
         ),
-        html.Button('Submit', id='button', style = {
+        html.P('CPUs:', style={
             'margin-top': '10px'
         }),
-        html.Div(id='output-processing'),
-        dcc.Loading(id="loading-2", children=[html.Div(id="loading-output-2")], type="default")
+        dcc.Slider(
+            id='cpu-slider',
+            min=1,
+            max=multiprocessing.cpu_count(),
+            step=1,
+            marks={i: '{}'.format(i) for i in range(multiprocessing.cpu_count()+1)},
+            value=multiprocessing.cpu_count()
+        ),  
+        html.Button('Submit', id='button', style = {
+            'margin-top': '30px'
+        })        
     ], style={
+            '-webkit-box-shadow': '-7px 7px 5px -4px rgba(0,0,0,0.25)',
+            '-moz-box-shadow': '-7px 7px 5px -4px rgba(0,0,0,0.25)',
+            'box-shadow': '-7px 7px 5px -4px rgba(0,0,0,0.25)',
             'margin': '0px',
             'width': '30%',
             'background-color': '#F7F7F7',
             'padding': '20px',
-            'border-radius': '15px',
+            'border-radius': '5px',
+            'display': '-webkit-flex',
+            '-webkit-flex-direction': 'column',
+            'display': 'flex',
+            'flex-direction': 'column',
+    }),
+    html.Div([
+        html.Div(id='output-processing'),
+        dcc.Loading(id='loading-2', children=[html.Div(id='loading-output-2')], type='default')        
+    ], style={
+            '-webkit-box-shadow': '7px 7px 5px -4px rgba(0,0,0,0.25)',
+            '-moz-box-shadow': '7px 7px 5px -4px rgba(0,0,0,0.25)',
+            'box-shadow': '7px 7px 5px -4px rgba(0,0,0,0.25)',
+            'margin': '0px',
+            'margin-left': '10px',
+            'width': '80%',
+            'background-color': '#F7F7F7',
+            'padding': '20px',
+            'border-radius': '5px',
             'display': '-webkit-flex',
             '-webkit-flex-direction': 'column',
             'display': 'flex',
             'flex-direction': 'column',
     })
+    ], style = {
+        'width':'100%',
+        'display': '-webkit-flex',
+        '-webkit-flex-direction': 'row',
+        'display': 'flex',
+        'flex-direction': 'row',
+        'margin': '0px',
+        'padding': '0px',
+})
 ], style = {
         'width':'100%',
         'display': '-webkit-flex',
@@ -97,6 +145,102 @@ app.layout = html.Div([
         'margin': '0px',
         'padding': '0px',
 })
+
+@app.callback(Output('tabs-content', 'children'),
+              [Input('tabs', 'value')])
+def render_content(tab):
+    global result
+    count = len(result.Subjects[0].MIXprop[0])
+    if tab == 'tab-1':
+        xLabel = result.Subjects[0].MIXprop[0].index
+        columns = result.Subjects[0].MIXprop[0].columns        
+        return html.Div([
+            html.H3('Bar Plot Subject-Proportions'),
+            dcc.Graph(
+                id='graph-1-tabs',
+                figure=go.Figure(                    
+                    data=[go.Bar(x=xLabel, y=[result.Subjects[0].MIXprop[0].iloc[j].values[i] for j in range(count)], name = columns[i]) for i in range(len(columns))],
+                    layout=go.Layout(
+                        barmode='relative',
+                        title_text='Bar Plot',
+                        height=600
+                    )
+                )
+            )
+        ])
+    elif tab == 'tab-2':
+        items = [result.Subjects[0].MIXprop[0].iloc[j].values for j in range(len(result.Subjects[0].MIXprop[0]))]        
+        return html.Div([
+            html.H3('Heatmaps of estimated cell-type proportion values'),
+            dcc.Graph(
+                id='graph-2',
+                figure=go.Figure(data=go.Heatmap(
+                    z=np.transpose(items),
+                    x=result.Subjects[0].MIXprop[0].index,
+                    y=result.Subjects[0].MIXprop[0].columns),
+                    layout=go.Layout(
+                        height=600
+                    )
+                )
+            )
+        ])
+    elif tab == 'tab-3':
+        mean = np.mean(result.Subjects[0].ACCmetrix[0].IscBySbj.values)
+        std = np.std(result.Subjects[0].ACCmetrix[0].IscBySbj.values)
+        return html.Div([
+            html.H3('Immuno Content Score (Population Based)'),
+            dcc.Graph(
+                id='graph-2',
+                figure=go.Figure(
+                    data=[go.Scatter(
+                        x=result.Subjects[0].ACCmetrix[0].index, 
+                        y=result.Subjects[0].ACCmetrix[0].IscBySbj.values, 
+                        mode='markers'
+                    )],
+                    layout=go.Layout(
+                        shapes=[
+                            go.layout.Shape(
+                                type="line",
+                                x0=-1,
+                                y0=mean,
+                                x1=count,
+                                y1=mean,
+                                line=dict(
+                                    color="red",
+                                    width=2,
+                                    dash="dashdot",
+                                ),
+                            ),
+                            go.layout.Shape(
+                                type="line",
+                                x0=-1,
+                                y0=(mean+2*std),
+                                x1=count,
+                                y1=(mean+2*std),
+                                line=dict(
+                                    color="blue",
+                                    width=2,
+                                    dash="dashdot",
+                                ),
+                            ),
+                            go.layout.Shape(
+                                type="line",
+                                x0=-1,
+                                y0=(mean-2*std),
+                                x1=count,
+                                y1=(mean-2*std),
+                                line=dict(
+                                    color="blue",
+                                    width=2,
+                                    dash="dashdot",
+                                ),
+                            )
+                        ],
+                        height=600
+                    )
+                )
+            )
+        ])
 
 
 def parse_contents(contents, filename, date):
@@ -160,8 +304,9 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     Output("loading-output-2", "children"),
     [dash.dependencies.Input('button', 'n_clicks')],
     [dash.dependencies.State('signature-input', 'value'),
-    dash.dependencies.State('population-input', 'value')])
-def update_output(n_clicks, signature, population):
+     dash.dependencies.State('cpu-slider', 'value'),
+     dash.dependencies.State('population-input', 'value')])
+def update_output(n_clicks, signature, cpu, population):
    
     global expression, result, pValues
     
@@ -174,14 +319,18 @@ def update_output(n_clicks, signature, population):
         
         Y = pd.read_excel(expression, sheet_name = 0) 
         
-        if __name__ == '__main__':
+        if __name__ == '__main__':            
+            result, pValues = Mixture.Mixture(X, Y , cpu, population, '')
             
-            result, pValues = Mixture.Mixture(X, Y , 4, population, '')            
-                      
-                      
         children = [
-            html.H4('Finish Processing'),
-            html.A('Download result', href='/download_result/')
+            html.H4('Finished Process'),
+            html.A('Download result', href='/download_result/'),
+            dcc.Tabs(id='tabs', value='tab-1', children=[
+                dcc.Tab(label='Bar Plot', value='tab-1'),
+                dcc.Tab(label='Heatmaps', value='tab-2'),
+                dcc.Tab(label='Immuno Content Score', value='tab-3'),
+            ]),
+            html.Div(id='tabs-content')
         ]
         
         return children
@@ -222,17 +371,17 @@ def download_excel ():
 def input_triggers_spinner_2(value, signature, population):
     if value is not None:
         children = [
-            html.P('Processing data...', style = {
-                'margin-top': '10px'
-            }),
-            html.P('Signature: ' + str(signature), style = {
-                'margin-top': '10px'
-            }),
-            html.P('Population based : ' + str(population), style = {
-                'margin-top': '10px'
-            })
+            #html.P('Processing data...', style = {
+            #    'margin-top': '10px'
+            #}),
+            #html.P('Signature: ' + str(signature), style = {
+            #    'margin-top': '10px'
+            #}),
+            #html.P('Population based : ' + str(population), style = {
+            #    'margin-top': '10px'
+            #})
         ]
-        return children
+        #return children
 
 if __name__ == '__main__':
     app.run_server(debug=True)
