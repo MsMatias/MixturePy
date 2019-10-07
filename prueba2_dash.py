@@ -101,7 +101,7 @@ app.layout = html.Div([
             'box-shadow': '-7px 7px 5px -4px rgba(0,0,0,0.25)',
             'margin': '0px',
             'width': '30%',
-            'background-color': '#F7F7F7',
+            'background-color': '#FFFFFF',
             'padding': '20px',
             'border-radius': '5px',
             'display': '-webkit-flex',
@@ -119,7 +119,7 @@ app.layout = html.Div([
             'margin': '0px',
             'margin-left': '10px',
             'width': '80%',
-            'background-color': '#F7F7F7',
+            'background-color': '#FFFFFF',
             'padding': '20px',
             'border-radius': '5px',
             'display': '-webkit-flex',
@@ -144,6 +144,7 @@ app.layout = html.Div([
         'flex-direction': 'column',
         'margin': '0px',
         'padding': '0px',
+        'background-color': '#F7F7F7',
 })
 
 @app.callback(Output('tabs-content', 'children'),
@@ -163,7 +164,7 @@ def render_content(tab):
                     layout=go.Layout(
                         barmode='relative',
                         title_text='Bar Plot',
-                        height=600
+                        height=700
                     )
                 )
             )
@@ -179,7 +180,7 @@ def render_content(tab):
                     x=result.Subjects[0].MIXprop[0].index,
                     y=result.Subjects[0].MIXprop[0].columns),
                     layout=go.Layout(
-                        height=600
+                        height=700
                     )
                 )
             )
@@ -236,7 +237,7 @@ def render_content(tab):
                                 ),
                             )
                         ],
-                        height=600
+                        height=700
                     )
                 )
             )
