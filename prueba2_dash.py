@@ -26,9 +26,18 @@ output = ''
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+#app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__)
 server = app.server
 app.config['suppress_callback_exceptions'] = True
+app.css.config.serve_locally = True
+app.script.config.serve_locally = True
+
+cssStylesheets = ['main.css']
+for stylesheet in cssStylesheets:
+    app.css.append_css({
+        "external_url": 'assets/css/' + stylesheet
+    })
 
 app.layout = html.Div([
     html.Div([
