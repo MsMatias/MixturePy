@@ -27,12 +27,18 @@ if sys.platform == "win32":
 else:
     base = ".py"
 
-
-executables = [
+if sys.platform == "win32":
+    executables = [
     Executable('server.py',
                base=base,
                targetName='MixturePy.exe')
 ]
+else:
+    executables = [
+    Executable('server.py',
+               base=base)
+]
+
 
 setup(
     name='MixturePy',
