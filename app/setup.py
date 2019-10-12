@@ -27,6 +27,8 @@ if sys.platform == "win32":
 else:
     base = ".py"
 
+print(base)
+
 if sys.platform == "win32":
     executables = [
     Executable('server.py',
