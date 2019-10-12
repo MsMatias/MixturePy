@@ -1,1 +1,7 @@
+#Ignore all file xlsx/xls
 *.xlsx
+*.xls
+
+#Ignore dist and build folder
+build/
+dist/
