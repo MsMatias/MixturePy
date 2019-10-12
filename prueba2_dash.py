@@ -10,7 +10,7 @@ import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_table
+import dash_table as dt
 from flask import send_file
 import plotly.graph_objects as go
 
@@ -20,6 +20,7 @@ expression = ''
 filename_expression = ''
 result = ''
 pValues = ''
+tableMetrics = ''
 
 cores = 4
 output = ''
@@ -31,15 +32,12 @@ app = dash.Dash(__name__)
 server = app.server
 app.config['suppress_callback_exceptions'] = True
 app.css.config.serve_locally = True
-app.script.config.serve_locally = True
-
-cssStylesheets = ['main.css']
-for stylesheet in cssStylesheets:
-    app.css.append_css({
-        "external_url": 'assets/css/' + stylesheet
-    })
 
 app.layout = html.Div([
+    html.Link(
+        rel='stylesheet',
+        href='/assets/css/main.css'
+    ),
     html.Div([
       html.Img(src='assets/img/logo_mixture.png', style = {
           'width': '300px'
@@ -105,11 +103,12 @@ app.layout = html.Div([
             'margin-top': '30px'
         })        
     ], style={
-            '-webkit-box-shadow': '-7px 7px 5px -4px rgba(0,0,0,0.25)',
-            '-moz-box-shadow': '-7px 7px 5px -4px rgba(0,0,0,0.25)',
-            'box-shadow': '-7px 7px 5px -4px rgba(0,0,0,0.25)',
+            '-webkit-box-shadow': '1px 2px 3px 1px rgba(0,0,0,0.25)',
+            '-moz-box-shadow': '1px 2px 3px 1px rgba(0,0,0,0.25)',
+            'box-shadow': '1px 2px 3px 1px rgba(0,0,0,0.25)',
             'margin': '0px',
-            'width': '30%',
+            'flex': '1',
+            'height':'100%',
             'background-color': '#FFFFFF',
             'padding': '20px',
             'border-radius': '5px',
@@ -122,12 +121,13 @@ app.layout = html.Div([
         html.Div(id='output-processing'),
         dcc.Loading(id='loading-2', children=[html.Div(id='loading-output-2')], type='default')        
     ], style={
-            '-webkit-box-shadow': '7px 7px 5px -4px rgba(0,0,0,0.25)',
-            '-moz-box-shadow': '7px 7px 5px -4px rgba(0,0,0,0.25)',
-            'box-shadow': '7px 7px 5px -4px rgba(0,0,0,0.25)',
+            '-webkit-box-shadow': '1px 2px 3px 1px rgba(0,0,0,0.25)',
+            '-moz-box-shadow': '1px 2px 3px 1px rgba(0,0,0,0.25)',
+            'box-shadow': '1px 2px 3px 1px rgba(0,0,0,0.25)',
             'margin': '0px',
             'margin-left': '10px',
-            'width': '80%',
+            'flex': '3',
+            'height':'100%',
             'background-color': '#FFFFFF',
             'padding': '20px',
             'border-radius': '5px',
@@ -138,15 +138,18 @@ app.layout = html.Div([
     })
     ], style = {
         'width':'100%',
+        'height':'100%',
         'display': '-webkit-flex',
         '-webkit-flex-direction': 'row',
         'display': 'flex',
+        'flex-wrap': 'wrap',
         'flex-direction': 'row',
         'margin': '0px',
         'padding': '0px',
 })
 ], style = {
         'width':'100%',
+        'height':'100%',
         'display': '-webkit-flex',
         '-webkit-flex-direction': 'column',
         'display': 'flex',
@@ -158,7 +161,7 @@ app.layout = html.Div([
 
 @app.callback(Output('tabs-content', 'children'),
               [Input('tabs', 'value')])
-def render_content(tab):
+def render_content1(tab):
     global result
     count = len(result.Subjects[0].MIXprop[0])
     if tab == 'tab-1':
@@ -187,7 +190,12 @@ def render_content(tab):
                 figure=go.Figure(data=go.Heatmap(
                     z=np.transpose(items),
                     x=result.Subjects[0].MIXprop[0].index,
-                    y=result.Subjects[0].MIXprop[0].columns),
+                    y=result.Subjects[0].MIXprop[0].columns,
+                    colorscale= [
+                        [0.0, 'rgb(255,255,255)'],
+                        [1.0, 'rgb(255,0,0)']
+                    ]
+                ),
                     layout=go.Layout(
                         height=700
                     )
@@ -252,6 +260,46 @@ def render_content(tab):
             )
         ])
 
+@app.callback(Output('tabs2-content', 'children'),
+              [Input('tabs2', 'value')])
+def render_content2(tab):
+    if tab == 'tab2-1':
+        return html.Div([
+            html.H4('Finished Process'),
+            html.A('Download result', href='/download_result/')
+        ])
+    elif tab == 'tab2-2':
+        return html.Div([
+            dcc.Tabs(id='tabs3', value='tab3-1', children=[
+                dcc.Tab(label='Absolute', value='tab3-1'),
+                dcc.Tab(label='Proportions', value='tab3-2'),
+                dcc.Tab(label='Metrics', value='tab3-3'),
+            ]),
+            dt.DataTable(id='tabs3-content', style_table={'overflowX': 'scroll'})
+        ])
+    elif tab == 'tab2-3':
+        return html.Div([
+            dcc.Tabs(id='tabs', value='tab-1', children=[
+                dcc.Tab(label='Bar Plot', value='tab-1'),
+                dcc.Tab(label='Heatmaps', value='tab-2'),
+                dcc.Tab(label='Immuno Content Score', value='tab-3'),
+            ]),
+            html.Div(id='tabs-content')
+        ])     
+
+@app.callback([Output('tabs3-content', 'data'), Output('tabs3-content', 'columns')],
+              [Input('tabs3', 'value')])
+def update_data(tab):
+    global result
+    absolute = result.Subjects[0].MIXabs[0].reset_index()
+    proportions = result.Subjects[0].MIXprop[0].reset_index()
+    metrics = result.Subjects[0].ACCmetrix[0].reset_index()
+    if tab == 'tab3-1':
+        return [absolute.to_dict('records'), [{"name": i, "id": i} for i in absolute.columns]]
+    elif tab == 'tab3-2':
+        return [proportions.to_dict('records'), [{"name": i, "id": i} for i in proportions.columns]]
+    elif tab == 'tab3-3':
+        return [metrics.to_dict('records'), [{"name": i, "id": i} for i in metrics.columns]]
 
 def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
@@ -280,7 +328,7 @@ def parse_contents(contents, filename, date):
     filename_expression = filename
     
     return html.Div([
-        html.H5('Expressions File:' + filename),
+        html.P('Selected:' + filename),
         #html.H6(datetime.datetime.fromtimestamp(date)),
 
         #dash_table.DataTable(
@@ -318,7 +366,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
      dash.dependencies.State('population-input', 'value')])
 def update_output(n_clicks, signature, cpu, population):
    
-    global expression, result, pValues
+    global expression, result, pValues, tableMetrics
     
     if n_clicks is not None:
         
@@ -332,15 +380,15 @@ def update_output(n_clicks, signature, cpu, population):
         if __name__ == '__main__':            
             result, pValues = Mixture.Mixture(X, Y , cpu, population, '')
             
-        children = [
-            html.H4('Finished Process'),
-            html.A('Download result', href='/download_result/'),
-            dcc.Tabs(id='tabs', value='tab-1', children=[
-                dcc.Tab(label='Bar Plot', value='tab-1'),
-                dcc.Tab(label='Heatmaps', value='tab-2'),
-                dcc.Tab(label='Immuno Content Score', value='tab-3'),
+            metrics = result.Subjects[0].ACCmetrix[0].reset_index()
+            
+        children = [            
+            dcc.Tabs(id='tabs2', value='tab2-1', children=[
+                dcc.Tab(label='Download', value='tab2-1'),
+                dcc.Tab(label='Tables', value='tab2-2'),
+                dcc.Tab(label='Plots', value='tab2-3'),
             ]),
-            html.Div(id='tabs-content')
+            html.Div(id='tabs2-content')
         ]
         
         return children

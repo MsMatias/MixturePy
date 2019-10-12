@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='Mixture',
-      version='0.1',
+      version='0.5',
       description='Mixture for Py',
       url='https://github.com/MsMatias/MixturePy',
       author='Mixture',
@@ -12,5 +12,7 @@ setup(name='Mixture',
             'numpy',
             'sklearn',
             'rpy2'
+            'multiprocessing',
+            'joblib'          
       ],
       zip_safe=False)
