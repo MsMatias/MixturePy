@@ -9,9 +9,15 @@ options = {
             'cx_Logging', 'idna',
         ],
         'packages': [
-            'asyncio', 'flask', 'jinja2', 'dash', 'plotly', 'waitress'
+            'asyncio', 'flask', 'jinja2', 'dash', 'plotly', 'waitress', 'scipy.signal', 'scipy.sparse',  'scipy.integrate', 'xlsxwriter'
         ],
-        'excludes': ['tkinter']
+        'excludes': [
+            'tkinter', 'scipy.spatial.cKDTree'
+        ],
+        'include_files': [
+            'assets/',
+            'data/'
+        ]
     }
 }
 
@@ -24,13 +30,14 @@ else:
 
 executables = [
     Executable('server.py',
-               base=base)
+               base=base,
+               targetName='MixturePy.exe')
 ]
 
 setup(
     name='MixturePy',
     packages=find_packages(),
-    version='0.4.0',
+    version='0.5.0',
     description='rig',
     executables=executables,
     options=options
