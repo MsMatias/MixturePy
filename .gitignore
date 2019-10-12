@@ -5,3 +5,7 @@
 #Ignore dist and build folder
 build/
 dist/
+app/dist/
+app/build/
+
+MixturePy.spec
