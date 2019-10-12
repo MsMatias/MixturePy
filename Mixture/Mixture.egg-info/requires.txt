@@ -1,4 +1,5 @@
 pandas
 numpy
 sklearn
-rpy2
+rpy2multiprocessing
+joblib
