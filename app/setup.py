@@ -35,8 +35,7 @@ if sys.platform == "win32":
 ]
 else:
     executables = [
-    Executable('server.py',
-               base=base)
+    Executable('server.py')
 ]
 
 
