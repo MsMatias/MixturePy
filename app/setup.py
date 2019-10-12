@@ -24,8 +24,6 @@ options = {
 base = None
 if sys.platform == "win32":
     base = "console"
-else:
-    base = ".py"
 
 print(base)
 
