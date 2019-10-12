@@ -1,3 +1,4 @@
+import sys
 from setuptools import find_packages
 from cx_Freeze import setup, Executable
 
@@ -14,14 +15,20 @@ options = {
     }
 }
 
+base = None
+if sys.platform == "win32":
+    base = "console"
+else:
+    base = ".py"
+
+
 executables = [
     Executable('server.py',
-               base='console',
-               targetName='halliburton_dash_rig.exe')
+               base=base)
 ]
 
 setup(
-    name='halliburton_dash_rig',
+    name='MixturePy',
     packages=find_packages(),
     version='0.4.0',
     description='rig',
