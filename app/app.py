@@ -3,6 +3,8 @@ import datetime
 import io
 import Mixture
 import multiprocessing
+import sys
+import os
 
 import numpy as np
 
@@ -33,13 +35,33 @@ server = app.server
 app.config['suppress_callback_exceptions'] = True
 app.css.config.serve_locally = True
 
+
+urlCss = './assets/css/main.css'
+urlLogo = './assets/img/logo_mixture.png'
+urlTil10 = 'data/TIL10_signature.xlsx'
+urlLm22 = 'data/LM22Signature.xlsx'
+
+def find_data_file(filename):
+    if getattr(sys, 'frozen', False):
+        # The application is frozen
+        datadir = os.path.dirname(sys.executable)
+    else:
+        # The application is not frozen
+        # Change this bit to match where you store your data files:
+        datadir = os.path.dirname(__file__)
+    return os.path.join(datadir, filename)
+
+#urlLogo = find_data_file(urlLogo)
+
+#print(urlLogo.replace('\\', '/'))
+
 app.layout = html.Div([
     html.Link(
         rel='stylesheet',
-        href='/assets/css/main.css'
+        href=urlCss
     ),
     html.Div([
-      html.Img(src='assets/img/logo_mixture.png', style = {
+      html.Img(src=urlLogo, style = {
           'width': '300px'
       }),
       #html.H2('MIXTURE'),
@@ -107,15 +129,10 @@ app.layout = html.Div([
             '-moz-box-shadow': '1px 2px 3px 1px rgba(0,0,0,0.25)',
             'box-shadow': '1px 2px 3px 1px rgba(0,0,0,0.25)',
             'margin': '0px',
-            'flex': '1',
-            'height':'100%',
             'background-color': '#FFFFFF',
             'padding': '20px',
             'border-radius': '5px',
-            'display': '-webkit-flex',
-            '-webkit-flex-direction': 'column',
-            'display': 'flex',
-            'flex-direction': 'column',
+            'max-width': '20vw'
     }),
     html.Div([
         html.Div(id='output-processing'),
@@ -126,26 +143,19 @@ app.layout = html.Div([
             'box-shadow': '1px 2px 3px 1px rgba(0,0,0,0.25)',
             'margin': '0px',
             'margin-left': '10px',
-            'flex': '3',
-            'height':'100%',
             'background-color': '#FFFFFF',
             'padding': '20px',
             'border-radius': '5px',
-            'display': '-webkit-flex',
-            '-webkit-flex-direction': 'column',
-            'display': 'flex',
-            'flex-direction': 'column',
+            'width': '80vw',
+            'max-width': '80vw'
     })
     ], style = {
         'width':'100%',
         'height':'100%',
-        'display': '-webkit-flex',
-        '-webkit-flex-direction': 'row',
-        'display': 'flex',
-        'flex-wrap': 'wrap',
-        'flex-direction': 'row',
         'margin': '0px',
         'padding': '0px',
+        'display': 'flex',
+        'flex-direction': 'row'
 })
 ], style = {
         'width':'100%',
@@ -366,18 +376,23 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
      dash.dependencies.State('population-input', 'value')])
 def update_output(n_clicks, signature, cpu, population):
    
-    global expression, result, pValues, tableMetrics
+    global expression, result, pValues, tableMetrics, urlLm22, urlTil10
     
     if n_clicks is not None:
         
         if signature == 'LM22':
-            X = pd.read_excel('data/LM22Signature.xlsx', sheet_name = 0)
+            X = pd.read_excel(find_data_file(urlLm22), sheet_name = 0)
         elif signature == 'TIL10':
-            X = pd.read_excel('data/TIL10_signature.xlsx', sheet_name = 0)
+            X = pd.read_excel(find_data_file(urlTil10), sheet_name = 0)
         
         Y = pd.read_excel(expression, sheet_name = 0) 
+
+        print('PRUEBA-------------------------------------')
+        print(__name__)
         
-        if __name__ == '__main__':            
+        #if __name__ == '__main__':            
+        #if __name__ == 'app':
+        if True:
             result, pValues = Mixture.Mixture(X, Y , cpu, population, '')
             
             metrics = result.Subjects[0].ACCmetrix[0].reset_index()
@@ -442,4 +457,4 @@ def input_triggers_spinner_2(value, signature, population):
         #return children
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8050)
+    app.run_server(debug=True, port=8080)

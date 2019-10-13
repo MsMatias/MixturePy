@@ -11,8 +11,6 @@ setup(name='Mixture',
             'pandas',
             'numpy',
             'sklearn',
-            'rpy2'
-            'multiprocessing',
             'joblib'          
       ],
       zip_safe=False)
