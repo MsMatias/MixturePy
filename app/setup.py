@@ -25,8 +25,6 @@ base = None
 if sys.platform == "win32":
     base = "console"
 
-print(base)
-
 if sys.platform == "win32":
     executables = [
     Executable('server.py',
