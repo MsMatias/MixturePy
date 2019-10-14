@@ -37,10 +37,10 @@ X = pd.read_excel('data/LM22_signature.xlsx', sheet_name = 0)
 Y = pd.read_excel('data/NewmanFL.xlsx', sheet_name = 0) 
 
 #Number of cores that will work
-core = 4
+cores = 4
 
 #Number of permutation samples
-iter = 500
+iters = 500
 
 #Name the output file xlsx (without format)
 output = 'Result_Newman'
