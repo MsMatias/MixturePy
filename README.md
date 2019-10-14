@@ -29,6 +29,8 @@ The current "functional like" version of the software requires the following lib
 
 This example tends to estimate the same pure cell-types from LM22 signature matrix from NewMan
 ```
+import pandas as pd
+
 # Read xlsx files
 X = pd.read_excel('data/LM22_signature.xlsx', sheet_name = 0) 
 Y = pd.read_excel('data/NewmanFL.xlsx', sheet_name = 0) 
