@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='Mixture',
-      version='0.5',
+      version='0.7',
       description='Mixture for Py',
       url='https://github.com/MsMatias/MixturePy',
       author='Mixture',
@@ -13,10 +13,10 @@ setup(name='Mixture',
       install_requires=[
             'pandas',
             'numpy',
-            'sklearn',
-            'rpy2'
-            'multiprocessing',
-            'joblib'          
+            'scikit-learn',
+            'joblib',
+            'xlrd',
+            'openpyxl'
       ],
       classifiers=[
         "Programming Language :: Python :: 3",

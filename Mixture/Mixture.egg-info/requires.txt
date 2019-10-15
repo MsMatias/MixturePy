@@ -1,5 +1,6 @@
 pandas
 numpy
-sklearn
-rpy2multiprocessing
+scikit-learn
 joblib
+xlrd
+openpyxl

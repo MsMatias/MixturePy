@@ -1,1 +1,14 @@
+#Ignore all file xlsx/xls
 *.xlsx
+*.xls
+
+#Ignore dist and build folder
+build/
+dist/
+app/dist/
+app/build/
+Mixture/build/
+Mixture/dist/
+Mixture/Mixture.egg-info/
+
+MixturePy.spec
