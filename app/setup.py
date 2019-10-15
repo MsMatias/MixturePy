@@ -40,7 +40,7 @@ else:
 setup(
     name='MixturePy',
     packages=find_packages(),
-    version='0.5.0',
+    version='0.6.0',
     description='rig',
     executables=executables,
     options=options

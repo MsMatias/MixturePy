@@ -109,8 +109,8 @@ app.layout = html.Div([
             id='population-input',
             placeholder='Enter a value...',
             type='number',
-            min='1',
-            value=''
+            min='0',
+            value='0'
         ),
         html.P('CPUs:', style={
             'margin-top': '10px'
@@ -390,12 +390,12 @@ def update_output(n_clicks, signature, cpu, population):
         Y = pd.read_excel(expression, sheet_name = 0) 
 
         print('PRUEBA-------------------------------------')
-        print(__name__)
+        print(int(population))
         
         #if __name__ == '__main__':            
         #if __name__ == 'app':
         if True:
-            result, pValues = Mixture.Mixture(X, Y , cpu, population, '')
+            result, pValues = Mixture.Mixture(X, Y , cpu, int(population), '')
             
             metrics = result.Subjects[0].ACCmetrix[0].reset_index()
             
@@ -419,8 +419,9 @@ def download_excel ():
     excel_writer = pd.ExcelWriter(strIO, engine="xlsxwriter")
     result.Subjects[0].MIXabs[0].to_excel(excel_writer, sheet_name='Absolute')
     result.Subjects[0].MIXprop[0].to_excel(excel_writer, sheet_name='Proportions')
-    result.Subjects[0].ACCmetrix[0].to_excel(excel_writer, sheet_name='Metrics')        
-    pValues.to_excel(excel_writer, sheet_name='Pvalues')
+    result.Subjects[0].ACCmetrix[0].to_excel(excel_writer, sheet_name='Metrics')
+    if pValues is not None:
+        pValues.to_excel(excel_writer, sheet_name='Pvalues')
     result.usedGenes[0].to_excel(excel_writer, sheet_name='UsedGenes', index=False)
     excel_writer.save()
     excel_data = strIO.getvalue()
