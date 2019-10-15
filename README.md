@@ -13,11 +13,16 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 The current "functional like" version of the software requires the following libraries, however, this package download automatically yours dependencies
+ * python3 >= 3.6
+ * pip3
+ * xlrd
+ * scikit-learn
+ * openpyxl
  * pandas
  * numpy
- * sklearn
  * multiprocessing
  * joblib
+ 
 
 ### Installing
 * [User Guide](https://github.com/MsMatias/MixturePy/wiki)
