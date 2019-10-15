@@ -6,7 +6,7 @@ Since the significant impact of immunotherapy in cancer, the estimation of the i
 
 ## Getting Started
 
-* [User Guide](https://docs.google.com/presentation/d/1lv8YGpmyuf9n9UUKAm5GavVHrqdSYf9m1UrzU_a0sK8/edit?usp=sharing)
+* [User Guide](https://github.com/MsMatias/MixturePy/wiki)
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
@@ -16,16 +16,15 @@ The current "functional like" version of the software requires the following lib
  * pandas
  * numpy
  * sklearn
- * rpy2
  * multiprocessing
  * joblib
 
 ### Installing
-* [User Guide](https://docs.google.com/presentation/d/1lv8YGpmyuf9n9UUKAm5GavVHrqdSYf9m1UrzU_a0sK8/edit?usp=sharing)
+* [User Guide](https://github.com/MsMatias/MixturePy/wiki)
 
 ## Running MIXTURE
 
-* [User Guide](https://docs.google.com/presentation/d/1lv8YGpmyuf9n9UUKAm5GavVHrqdSYf9m1UrzU_a0sK8/edit?usp=sharing)
+* [User Guide](https://github.com/MsMatias/MixturePy/wiki)
 
 This example tends to estimate the same pure cell-types from LM22 signature matrix from NewMan
 ```
