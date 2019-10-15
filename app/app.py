@@ -188,7 +188,8 @@ def render_content1(tab):
                     layout=go.Layout(
                         barmode='relative',
                         title_text='Bar Plot',
-                        height=700
+                        height=700,
+                        xaxis=dict(tickangle=-90, automargin= True)
                     )
                 )
             )
@@ -209,7 +210,8 @@ def render_content1(tab):
                     ]
                 ),
                     layout=go.Layout(
-                        height=700
+                        height=700,
+                        xaxis=dict(tickangle=-90, automargin= True)
                     )
                 )
             )
@@ -266,7 +268,8 @@ def render_content1(tab):
                                 ),
                             )
                         ],
-                        height=700
+                        height=700,
+                        xaxis=dict(tickangle=-90, automargin= True)
                     )
                 )
             )
@@ -388,9 +391,6 @@ def update_output(n_clicks, signature, cpu, population):
             X = pd.read_excel(find_data_file(urlTil10), sheet_name = 0)
         
         Y = pd.read_excel(expression, sheet_name = 0) 
-
-        print('PRUEBA-------------------------------------')
-        print(int(population))
         
         #if __name__ == '__main__':            
         #if __name__ == 'app':
