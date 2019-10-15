@@ -35,42 +35,55 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
   
     matRand = list()
 
-    print('Creating population (Count: ' + str(iter) + ')...')
+    if iter > 0:
 
-    matRand = Parallel(n_jobs=cores, backend='threading')(delayed(Utils.sampleRandom)(Y = Y, i = i, verbose = 1) for i in range(iter))
+        print('Creating population (Count: ' + str(iter) + ')...')
 
-    #for i in range(iter):
-    #    matRand.append(Utils.sampleRandom(Y, i, 1))
+        matRand = Parallel(n_jobs=cores, backend='threading')(delayed(Utils.sampleRandom)(Y = Y, i = i, verbose = 1) for i in range(iter))
 
-    print('Finish creating population')
+        #for i in range(iter):
+        #    matRand.append(Utils.sampleRandom(Y, i, 1))
 
-    matRand = map(list, zip(*matRand))
-    matRand = pd.DataFrame(matRand, Y['Gene symbol'])
-    matRand.reset_index(drop=True, inplace=True)
-    matRand = pd.concat([Y['Gene symbol'], matRand], sort = False, axis = 1)
+        print('Finish creating population')
 
-    print('Finish')
+        matRand = map(list, zip(*matRand))
+        matRand = pd.DataFrame(matRand, Y['Gene symbol'])
+        matRand.reset_index(drop=True, inplace=True)
+        matRand = pd.concat([Y['Gene symbol'], matRand], sort = False, axis = 1)
 
-    print('Running mixer with porpulationBased (Count: ' + str(matRand.shape[1]) + ')')
-    # Run Mixer Function with Random Matrix
-    outMix = Mixer(X, matRand, cores)
+        print('Finish')
 
-    #geneList = pd.DataFrame(geneList)
+        print('Running mixer with porpulationBased (Count: ' + str(matRand.shape[1]) + ')')
+        # Run Mixer Function with Random Matrix
+        outMix = Mixer(X, matRand, cores)
 
-    result = pd.DataFrame([orig, outMix.ACCmetrix[0], geneList], ['Subjects', 'PermutedMetrix', 'usedGenes']).T
+        #geneList = pd.DataFrame(geneList)
 
-    result.usedGenes[0] = pd.DataFrame(result.usedGenes[0])
+        result = pd.DataFrame([orig, outMix.ACCmetrix[0], geneList], ['Subjects', 'PermutedMetrix', 'usedGenes']).T
 
-    pValues = list()
-    
-    pValues = result.Subjects[0].ACCmetrix[0].apply(Utils.getPValues, args=(result.PermutedMetrix[0], ), axis = 1)
-    pValues = pd.DataFrame(pValues.values.tolist(), index = pValues.index, columns=['RMSEa', 'RMSEa', 'Ra', 'Rp']) 
-    
-    print('Finish')
+        result.usedGenes[0] = pd.DataFrame(result.usedGenes[0])
 
-    Utils.generateXlsx (result, pValues, nameFile)
+        pValues = list()
 
-    return result, pValues
+        pValues = result.Subjects[0].ACCmetrix[0].apply(Utils.getPValues, args=(result.PermutedMetrix[0], ), axis = 1)
+        pValues = pd.DataFrame(pValues.values.tolist(), index = pValues.index, columns=['RMSEa', 'RMSEa', 'Ra', 'Rp']) 
+
+        print('Finish')
+
+        Utils.generateXlsx (result, pValues, nameFile)
+
+        return result, pValues
+    else:
+        
+        result = pd.DataFrame([orig, geneList], ['Subjects', 'usedGenes']).T
+
+        result.usedGenes[0] = pd.DataFrame(result.usedGenes[0])
+        
+        print('Finish')
+
+        Utils.generateXlsx (result, None, nameFile)
+
+        return result, None
 
 
 
