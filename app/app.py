@@ -38,8 +38,8 @@ app.config['suppress_callback_exceptions'] = True
 app.css.config.serve_locally = True
 
 
-urlCss = './assets/css/main.css'
-urlLogo = './assets/img/logo_mixture.png'
+urlCss = 'assets/css/main.css'
+urlLogo = 'assets/img/logo.svg'
 urlTil10 = 'data/TIL10_signature.xlsx'
 urlLm22 = 'data/LM22Signature.xlsx'
 
@@ -53,22 +53,37 @@ def find_data_file(filename):
         datadir = os.path.dirname(__file__)
     return os.path.join(datadir, filename)
 
-#urlLogo = find_data_file(urlLogo)
+styleSheetFile =open(find_data_file(urlCss), "r")
+logoFile = open(find_data_file(urlLogo), "r")
 
-#print(urlLogo.replace('\\', '/'))
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <style>
+        ''' + str(styleSheetFile.read()) + '''
+        </style>
+    </head>
+    <body>
+        ''' + str(logoFile.read()) + '''
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
 
 app.layout = html.Div([
-    html.Link(
-        rel='stylesheet',
-        href=urlCss
-    ),
     html.Div([
-      html.Img(src=urlLogo, style = {
-          'width': '300px'
-      }),
-      #html.H2('MIXTURE'),
       html.H6('an improved algorithm for immune tumor microenvironment estimation based on gene expression data', style = {
-          'margin-top': '-20px'
+          'margin-top': '-10px'
       })
     ]),
     html.Div([
