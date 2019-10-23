@@ -31,7 +31,7 @@ The current "functional like" version of the software requires the following lib
 
 * [User Guide](https://github.com/MsMatias/MixturePy/wiki)
 
-This example tends to estimate the same pure cell-types from LM22 signature matrix from Newman et al.
+This example tends to estimate the same pure cell-types from LM22 signature matrix from [Newman et al.](http://www.nature.com/nmeth/journal/v12/n5/abs/nmeth.3337.html)
 ```
 import pandas as pd
 import Mixture
