@@ -7,5 +7,6 @@ build/
 dist/
 app/dist/
 app/build/
+data/
 
 MixturePy.spec
