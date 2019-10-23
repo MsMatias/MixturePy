@@ -6,10 +6,16 @@ with open("README.md", "r") as fh:
 setup(name='Mixture',
       version='0.7',
       description='Mixture for Py',
+      long_description=long_description,
+      long_description_content_type="text/markdown",
       url='https://github.com/MsMatias/MixturePy',
+      include_package_data = True,
       author='Mixture',
       license='MIT',
       packages=['Mixture'],
+      package_data = {
+            'Mixture': ['data/*']
+      },
       install_requires=[
             'pandas',
             'numpy',

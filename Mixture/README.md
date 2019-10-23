@@ -11,6 +11,5 @@ The current "functional like" version of the software requires the following lib
  * pandas
  * numpy
  * sklearn
- * rpy2
  * multiprocessing
  * joblib
