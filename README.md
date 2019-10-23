@@ -35,9 +35,13 @@ This example tends to estimate the same pure cell-types from LM22 signature matr
 ```
 import pandas as pd
 import Mixture
+import Mixture.Utils as mut
 
-# Read xlsx files
-X = pd.read_excel('data/LM22_signature.xlsx', sheet_name = 0) 
+# Load Data Signature
+# LM22 OR TIL10
+X = mut.loadSignature('LM22')
+
+# Read xlsx expression file
 Y = pd.read_excel('data/NewmanFL.xlsx', sheet_name = 0) 
 
 #Number of cores that will work
@@ -52,7 +56,6 @@ output = 'Result_Newman'
 # Run Mixer Function
 if __name__ == '__main__':
     result, pValues = Mixture.Mixture(X, Y , cores, iters, output)
-
 ```
 
 ## Contributing
