@@ -480,9 +480,5 @@ def input_triggers_spinner_2(value, signature, population):
         ]
         #return children
 
-def open_browser():
-      webbrowser.open_new('http://127.0.0.1:8082/')
-
 if __name__ == '__main__':
-    Timer(1, open_browser).start()
     app.run_server(debug=False, port=8082, host='127.0.0.1')
