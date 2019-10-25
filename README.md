@@ -6,11 +6,11 @@ Since the significant impact of immunotherapy in cancer, the estimation of the i
 
 ## Getting Started
 
-* [User Guide](https://github.com/MsMatias/MixturePy/wiki)
+* [User Guide](https://github.com/MsMatias/MixturePy/wiki/Getting-Started)
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Prerequisites
+## Prerequisites
 
 The current "functional like" version of the software requires the following libraries, however, this package download automatically yours dependencies
  * python3 >= 3.6
@@ -23,40 +23,19 @@ The current "functional like" version of the software requires the following lib
  * multiprocessing
  * joblib
  
+## Download & Installing MIXTURE PACKAGE
+* [Click Here](https://github.com/MsMatias/MixturePy/wiki/Download-&-Installation-Mixture-Package)
 
-### Installing
-* [User Guide](https://github.com/MsMatias/MixturePy/wiki)
+## Running MIXTURE PACKAGE
 
-## Running MIXTURE
+* [Click Here](https://github.com/MsMatias/MixturePy/wiki/Running-Mixture-Package)
 
-* [User Guide](https://github.com/MsMatias/MixturePy/wiki)
+## Download & Installing MIXTURE WEB APP
+* [Click Here](https://github.com/MsMatias/MixturePy/wiki/Download-&-Installation-Dash-App)
 
-This example tends to estimate the same pure cell-types from LM22 signature matrix from [Newman et al.](http://www.nature.com/nmeth/journal/v12/n5/abs/nmeth.3337.html)
-```
-import pandas as pd
-import Mixture
-import Mixture.Utils as mut
+## Running MIXTURE WEB APP
 
-# Load Data Signature
-# LM22 OR TIL10
-X = mut.loadSignature('LM22')
-
-# Read xlsx expression file
-Y = pd.read_excel('data/NewmanFL.xlsx', sheet_name = 0) 
-
-# Number of cores that will work
-cores = 4
-
-# Number of permutation samples
-iters = 500
-
-# Name the output file xlsx (without format)
-output = 'Result_Newman'
-
-# Run Mixer Function
-if __name__ == '__main__':
-    result, pValues = Mixture.Mixture(X, Y , cores, iters, output)
-```
+* [Click Here](https://github.com/MsMatias/MixturePy/wiki/Running-DashApp)
 
 ## Contributing
 
