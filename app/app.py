@@ -7,8 +7,10 @@ import Mixture
 import multiprocessing
 import sys
 import os
+import webbrowser
 
 import numpy as np
+
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -17,6 +19,8 @@ import dash_html_components as html
 import dash_table as dt
 from flask import send_file
 import plotly.graph_objects as go
+
+from threading import Timer
 
 import pandas as pd
 
@@ -79,6 +83,8 @@ app.index_string = '''
     </body>
 </html>
 '''
+
+app.title = 'MixturePy'
 
 app.layout = html.Div([
     html.Div([
@@ -474,5 +480,9 @@ def input_triggers_spinner_2(value, signature, population):
         ]
         #return children
 
+def open_browser():
+      webbrowser.open_new('http://127.0.0.1:8082/')
+
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8080)
+    Timer(1, open_browser).start()
+    app.run_server(debug=False, port=8082, host='127.0.0.1')
