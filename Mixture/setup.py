@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='Mixture',
-      version='0.7',
+      version='0.8',
       description='Mixture for Py',
       long_description=long_description,
       long_description_content_type="text/markdown",
