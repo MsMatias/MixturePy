@@ -414,3 +414,77 @@ there.
 
 /* Larger than Desktop HD */
 @media (min-width: 1200px) {}
+
+.logo {
+  width: 200px;
+}
+
+header {
+  display: -webkit-flex; /* Safari */
+  display: flex;
+}
+
+nav {
+  margin-left: 20px;
+  margin-top: -20px;
+}
+
+nav ul {
+  display: flex;
+  justify-content: space-around;
+  list-style-type: none;
+}
+
+.navigation {
+  list-style: none;
+  margin: 0; 
+    
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  
+  justify-content: flex-end;
+}
+
+.navigation a {
+  text-decoration: none;  
+  border-left: #333 1px solid;
+  display: block;
+  margin-top: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+  color: black;
+}
+
+#check_celllines input[type="checkbox"] {
+	-webkit-appearance: none;
+	background-color: #fafafa;
+	border: 1px solid #cacece;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+	padding: 9px;
+	border-radius: 3px;
+	display: inline-block;
+	position: relative;
+}
+
+#check_celllines input[type="checkbox"]:active, #check_celllines input[type="checkbox"]:checked:active {
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+}
+
+#check_celllines input[type="checkbox"]:checked {
+	background-color: #33C3F0;
+	border: 1px solid #555;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
+	color: #33C3F0;
+}
+
+#check_celllines input[type="checkbox"]:checked:after {
+	content: '\2714';
+	font-size: 14px;
+	position: absolute;
+	top: 0px;
+	left: 3px;
+	color:#ffffff;
+}

@@ -1,7 +1,7 @@
 import webbrowser
 
 from waitress import serve
-from app import server
+from main import server
 from threading import Timer
 
 def open_browser():
