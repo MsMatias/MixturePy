@@ -7,6 +7,12 @@ import multiprocessing
 import numpy as np
 import pandas as pd
 
+from joblib import Parallel, delayed
+
+from random import seed
+from random import sample 
+from random import randint
+
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
@@ -16,9 +22,22 @@ import plotly.graph_objects as go
 
 from app import app
 
-signature = ''
-filename_signature = ''
-dataFrameSignature = ''
+signature = None
+filename_signature = None
+dataFrameSignature = None
+result1 = None
+pValues1 = None
+tableMetrics1 = None
+result2 = None
+pValues2 = None
+tableMetrics2 = None
+subjects = None
+betas = None
+lines = None
+estimate_lines = None
+ids = None
+
+seed(123)
 
 layout = html.Div([
     html.Div([
@@ -110,6 +129,24 @@ layout = html.Div([
         'background-color': '#F7F7F7',
 })
 
+def createBetas (X, a, b, n):
+
+    ns = randint(a, b)
+    r = np.random.uniform(1, 0.2, ns)
+    rn = r/r.sum()
+    id = sample(range(n-1), ns)
+    betas = np.repeat(.0, n, axis=0)
+    for index, i in enumerate(id, start = 0):
+        betas[i] = rn[index]
+
+    vector = X.to_numpy(copy=True)    
+    vector = vector.flatten()
+        
+    A = np.dot(X, betas) + vector[sample(range(len(vector)), len(X.index))]
+
+    return betas, id, A
+
+
 def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
     
@@ -125,7 +162,6 @@ def parse_contents(contents, filename, date):
             # Assume that the user uploaded an excel file
             signature = io.BytesIO(decoded)
             dataFrameSignature = pd.read_excel(signature, sheet_name = 0)
-            print(len(dataFrameSignature.columns))
             
     except Exception as e:
         print(e)
@@ -142,15 +178,15 @@ def parse_contents(contents, filename, date):
         dcc.RangeSlider(
             id='lines_slider',
             min=1,
-            max=len(dataFrameSignature.columns),
+            max=(len(dataFrameSignature.columns)-1),
             step=1,
             # marks={i: '{}'.format(i) for i in range(len(dataFrameSignature.columns)+1)},
             marks={
               1: '1',
-              round(len(dataFrameSignature.columns)/2): str(round(len(dataFrameSignature.columns)/2)),
-              len(dataFrameSignature.columns): str(len(dataFrameSignature.columns))
+              round((len(dataFrameSignature.columns)-1)/2): str(round((len(dataFrameSignature.columns)-1)/2)),
+              (len(dataFrameSignature.columns)-1): str((len(dataFrameSignature.columns)-1))
             },
-            value=[round(len(dataFrameSignature.columns)*0.2), round(len(dataFrameSignature.columns)*0.75)]
+            value=[round((len(dataFrameSignature.columns)-1)*0.2), round((len(dataFrameSignature.columns)-1)*0.75)]
         ),
         html.P(id='lines_slider_output', style={
             'margin-top': '40px'
@@ -179,9 +215,9 @@ def update_lines(lines_slider):
     [dash.dependencies.Input('button_validate', 'n_clicks')],
     [dash.dependencies.State('lines_slider', 'value'),
      dash.dependencies.State('cpu-slider', 'value')])
-def update_output(n_clicks, lines, cpu):
+def update_output(n_clicks, lines_slider, cpu):
    
-    global signature, result, pValues, tableMetrics, urlLm22, urlTil10
+    global signature, dataFrameSignature, result1, pValues1, tableMetrics1, result2, pValues2, tableMetrics2, subjects, betas, lines, estimate_lines, ids
     
     if n_clicks is not None:
 
@@ -192,10 +228,41 @@ def update_output(n_clicks, lines, cpu):
         #if __name__ == '__main__':            
         #if __name__ == 'app':
         if True:
-            result, pValues = Mixture.Mixture(X, Y , cpu, 0, '')
-            
-            metrics = result.Subjects[0].ACCmetrix[0].reset_index()
 
+            rango = 500
+
+            lines = lines_slider
+
+            # Escenario 1
+            result1, pValues1 = Mixture.Mixture(X, Y , cpu, 1, '')            
+            metrics1 = result1.Subjects[0].ACCmetrix[0].reset_index()
+
+            # Escenario 2            
+            X = dataFrameSignature.iloc[:, 1:]
+
+            subjects = Parallel(n_jobs=cpu, backend='threading')(delayed(createBetas)(X = X, a = lines[0], b = lines[1], n = len(X.columns)) for i in range(rango))
+            
+            # Getting expression matrix
+            vector = [x[2] for x in subjects]
+            columns = ['V' + str(x+1) for x in range(len(subjects))]
+            Y2 = pd.DataFrame(np.column_stack(vector), columns=columns)
+            Y2.insert(0, 'Gene symbol', dataFrameSignature['Gene symbol'])
+
+            # Getting Real Betas Matrix
+            vector = [x[0] for x in subjects]
+            columns = ['V' + str(x+1) for x in range(len(subjects))]
+            betas = pd.DataFrame(np.column_stack(vector), columns=columns)
+
+            X = dataFrameSignature
+
+            result2, pValues2 = Mixture.Mixture(X, Y2 , cpu, 1, '') 
+            betasSim = result2.Subjects[0].MIXprop[0].to_numpy(copy = True)           
+            estimate_lines = pd.DataFrame([(betasSim[i] > 0).sum() for i in range(rango)])     
+            metrics2 = result2.Subjects[0].ACCmetrix[0].reset_index()
+
+            vector = [len(x[1]) for x in subjects]
+            ids = pd.DataFrame(np.column_stack(vector))
+            
         children = [            
             dcc.Tabs(id='tabs4', value='tab4-1', children=[
                 dcc.Tab(label='Plots', value='tab4-1'),
@@ -208,13 +275,131 @@ def update_output(n_clicks, lines, cpu):
 @app.callback(Output('tabs4-content', 'children'),
               [Input('tabs4', 'value')])
 def render_content2(tab):
-    if tab == 'tab4-3':
+    if tab == 'tab4-1':
         return html.Div([
-            dcc.Tabs(id='tabs5', value='tab5-1', children=[
+            dcc.Tabs(id='tabs5', value='tab5-3', children=[
                 dcc.Tab(label='Breal - Bsim', value='tab5-1'),
                 dcc.Tab(label='Breal vs Bsim', value='tab5-2'),
                 dcc.Tab(label='Heatmaps', value='tab5-3'),
                 dcc.Tab(label='BoxPlot', value='tab5-4'),
             ]),
-            html.Div(id='tabs-content')
-        ]) 
+            html.Div(id='tabs5-content')
+        ])
+
+@app.callback(Output('tabs5-content', 'children'),
+              [Input('tabs5', 'value')])
+def render_content1(tab):
+    global result1, result2, betas, lines, estimate_lines, ids
+    count = len(result1.Subjects[0].MIXprop[0])
+    if tab == 'tab5-1':      
+        betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
+        betasSim = betasSim.flatten()
+        betasHat = betas.to_numpy(copy=True)
+        betasHat = betasHat.flatten()
+        mean = np.mean(betasSim - betasHat)
+        std = np.std(betasSim - betasHat)
+        return html.Div([
+            html.H3('rReal betas - Simulated betas'),
+            dcc.Graph(
+                id='graph-3',
+                figure=go.Figure(data=go.Scatter(
+                    x = betasHat,
+                    y = betasSim - betasHat,
+                    mode='markers'
+                ),
+                layout=go.Layout(
+                        shapes=[
+                            go.layout.Shape(
+                                type="line",
+                                x0=-1,
+                                y0=mean,
+                                x1=count,
+                                y1=mean,
+                                line=dict(
+                                    color="red",
+                                    width=2,
+                                    dash="dashdot",
+                                ),
+                            ),
+                            go.layout.Shape(
+                                type="line",
+                                x0=-1,
+                                y0=(mean+2*std),
+                                x1=count,
+                                y1=(mean+2*std),
+                                line=dict(
+                                    color="blue",
+                                    width=2,
+                                    dash="dashdot",
+                                ),
+                            ),
+                            go.layout.Shape(
+                                type="line",
+                                x0=-1,
+                                y0=(mean-2*std),
+                                x1=count,
+                                y1=(mean-2*std),
+                                line=dict(
+                                    color="blue",
+                                    width=2,
+                                    dash="dashdot",
+                                ),
+                            )
+                        ],
+                        height=700,
+                        xaxis=dict(tickangle=-90, automargin= True)
+                    ))
+            )
+        ])
+    elif tab == 'tab5-2':      
+        betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
+        betasSim = betasSim.flatten()
+        betasHat = betas.to_numpy(copy=True)
+        betasHat = betasHat.flatten()
+        return html.Div([
+            html.H3('Real betas vs Simulated betas'),
+            dcc.Graph(
+                id='graph-3',
+                figure=go.Figure(data=go.Scatter(
+                    x = betasHat,
+                    y = betasSim,
+                    mode='markers'
+                ))
+            )
+        ])
+    elif tab == 'tab5-3':
+        items = [result1.Subjects[0].MIXprop[0].iloc[j].values for j in range(len(result1.Subjects[0].MIXprop[0]))]        
+        return html.Div([
+            html.H3('Aca un titulo para el heatmap (o no)'),
+            dcc.Graph(
+                id='graph-3',
+                figure=go.Figure(data=go.Heatmap(
+                    z=np.transpose(items),
+                    x=result1.Subjects[0].MIXprop[0].index,
+                    y=result1.Subjects[0].MIXprop[0].columns,
+                    colorscale= [
+                        [0.0, 'rgb(255,255,255)'],
+                        [1.0, 'rgb(255,0,0)']
+                    ]
+                ),
+                    layout=go.Layout(
+                        height=700,
+                        xaxis=dict(tickangle=-90, automargin= True)
+                    )
+                )
+            )
+        ])
+    elif tab == 'tab5-4':
+        items = [go.Box(y=estimate_lines[(ids.values == j)[0]][0], name = str(j)) for j in range(lines[0],lines[1])]        
+        return html.Div([
+            html.H3('Aca titulo para el boxplot'),
+            dcc.Graph(
+                id='graph-3',
+                figure=go.Figure(data=items,
+                    layout=go.Layout(
+                        height=700,
+                        xaxis=dict(tickangle=0, automargin= True)
+                    )
+                )
+            )
+        ])
