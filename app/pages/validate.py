@@ -62,6 +62,10 @@ layout = html.Div([
             multiple=True
         ),
         dcc.Loading(id="loading-1", children=[html.Div(id="loading-output-msignature")], type="default"),
+        html.P('False discovery test', style={
+            'border-top': '1px black solid',
+            'margin-top': '20px'
+        }),
         dcc.Checklist(
             id="check_celllines",
             options=[
@@ -172,21 +176,21 @@ def parse_contents(contents, filename, date):
     
     return html.Div([
         html.P('Selected: ' + filename),
-        html.P('No se que label colocarle aca:', style={
+        html.P('Max number of cell lines in the mixture simulated sample:', style={
             'margin-top': '10px'
         }),        
         dcc.RangeSlider(
             id='lines_slider',
-            min=1,
+            min=2,
             max=(len(dataFrameSignature.columns)-1),
             step=1,
             # marks={i: '{}'.format(i) for i in range(len(dataFrameSignature.columns)+1)},
             marks={
-              1: '1',
+              2: '2',
               round((len(dataFrameSignature.columns)-1)/2): str(round((len(dataFrameSignature.columns)-1)/2)),
               (len(dataFrameSignature.columns)-1): str((len(dataFrameSignature.columns)-1))
             },
-            value=[round((len(dataFrameSignature.columns)-1)*0.2), round((len(dataFrameSignature.columns)-1)*0.75)]
+            value=[2, round((len(dataFrameSignature.columns)-1)*0.75)]
         ),
         html.P(id='lines_slider_output', style={
             'margin-top': '40px'
@@ -229,7 +233,7 @@ def update_output(n_clicks, lines_slider, cpu):
         #if __name__ == 'app':
         if True:
 
-            rango = 100
+            rango = 10
 
             lines = lines_slider
 
@@ -265,7 +269,7 @@ def update_output(n_clicks, lines_slider, cpu):
             
         children = [            
             dcc.Tabs(id='tabs4', value='tab4-1', children=[
-                dcc.Tab(label='Plots', value='tab4-1'),
+                dcc.Tab(label='Similation Test', value='tab4-1'),
             ]),
             html.Div(id='tabs4-content')
         ]
@@ -278,10 +282,10 @@ def render_content2(tab):
     if tab == 'tab4-1':
         return html.Div([
             dcc.Tabs(id='tabs5', value='tab5-3', children=[
-                dcc.Tab(label='Breal - Bsim', value='tab5-1'),
-                dcc.Tab(label='Breal vs Bsim', value='tab5-2'),
-                dcc.Tab(label='Heatmaps', value='tab5-3'),
-                dcc.Tab(label='BoxPlot', value='tab5-4'),
+                dcc.Tab(label='Bland-Altman analysis', value='tab5-1'),
+                dcc.Tab(label='Correlation analysis', value='tab5-2'),
+                dcc.Tab(label='Self test', value='tab5-3'),
+                dcc.Tab(label='Number of Cell types', value='tab5-4'),
             ]),
             html.Div(id='tabs5-content')
         ])
@@ -299,7 +303,6 @@ def render_content1(tab):
         mean = np.mean(betasSim - betasHat)
         std = np.std(betasSim - betasHat)
         return html.Div([
-            html.H3('Real betas - Simulated betas'),
             dcc.Graph(
                 id='graph-3',
                 figure=go.Figure(data=go.Scatter(
@@ -362,7 +365,6 @@ def render_content1(tab):
         betasHat = betas.to_numpy(copy=True)
         betasHat = betasHat.flatten()
         return html.Div([
-            html.H3('Real betas vs Simulated betas'),
             dcc.Graph(
                 id='graph-3',
                 figure=go.Figure(data=go.Scatter(
@@ -394,7 +396,6 @@ def render_content1(tab):
     elif tab == 'tab5-3':
         items = [result1.Subjects[0].MIXprop[0].iloc[j].values for j in range(len(result1.Subjects[0].MIXprop[0]))]        
         return html.Div([
-            html.H3('Aca un titulo para el heatmap (o no)'),
             dcc.Graph(
                 id='graph-3',
                 figure=go.Figure(data=go.Heatmap(
@@ -416,7 +417,6 @@ def render_content1(tab):
     elif tab == 'tab5-4':
         items = [go.Box(y=estimate_lines[(ids.values == j)[0]][0], name = str(j)) for j in range(lines[0],lines[1])]        
         return html.Div([
-            html.H3('Aca titulo para el boxplot'),
             dcc.Graph(
                 id='graph-3',
                 figure=go.Figure(data=items,
