@@ -229,7 +229,7 @@ def update_output(n_clicks, lines_slider, cpu):
         #if __name__ == 'app':
         if True:
 
-            rango = 500
+            rango = 100
 
             lines = lines_slider
 
@@ -290,7 +290,7 @@ def render_content2(tab):
               [Input('tabs5', 'value')])
 def render_content1(tab):
     global result1, result2, betas, lines, estimate_lines, ids
-    count = len(result1.Subjects[0].MIXprop[0])
+    count = len(result2.Subjects[0].MIXprop[0])
     if tab == 'tab5-1':      
         betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
         betasSim = betasSim.flatten()
@@ -299,21 +299,23 @@ def render_content1(tab):
         mean = np.mean(betasSim - betasHat)
         std = np.std(betasSim - betasHat)
         return html.Div([
-            html.H3('rReal betas - Simulated betas'),
+            html.H3('Real betas - Simulated betas'),
             dcc.Graph(
                 id='graph-3',
                 figure=go.Figure(data=go.Scatter(
                     x = betasHat,
                     y = betasSim - betasHat,
-                    mode='markers'
+                    mode='markers',
+                    marker_color='rgba(0, 0, 0, .9)'
                 ),
                 layout=go.Layout(
                         shapes=[
                             go.layout.Shape(
                                 type="line",
-                                x0=-1,
+                                xref="paper",
+                                x0=0,
                                 y0=mean,
-                                x1=count,
+                                x1=1,
                                 y1=mean,
                                 line=dict(
                                     color="red",
@@ -323,9 +325,10 @@ def render_content1(tab):
                             ),
                             go.layout.Shape(
                                 type="line",
-                                x0=-1,
+                                xref="paper",
+                                x0=0,
                                 y0=(mean+2*std),
-                                x1=count,
+                                x1=1,
                                 y1=(mean+2*std),
                                 line=dict(
                                     color="blue",
@@ -335,9 +338,10 @@ def render_content1(tab):
                             ),
                             go.layout.Shape(
                                 type="line",
-                                x0=-1,
+                                xref="paper",
+                                x0=0,
                                 y0=(mean-2*std),
-                                x1=count,
+                                x1=1,
                                 y1=(mean-2*std),
                                 line=dict(
                                     color="blue",
@@ -348,7 +352,8 @@ def render_content1(tab):
                         ],
                         height=700,
                         xaxis=dict(tickangle=-90, automargin= True)
-                    ))
+                    )
+                )
             )
         ])
     elif tab == 'tab5-2':      
@@ -363,8 +368,27 @@ def render_content1(tab):
                 figure=go.Figure(data=go.Scatter(
                     x = betasHat,
                     y = betasSim,
-                    mode='markers'
-                ))
+                    mode='markers',
+                    marker_color='rgba(0, 0, 0, .9)'
+                ),
+                layout=go.Layout(
+                        shapes=[
+                            go.layout.Shape(
+                                type="line",
+                                x0=0,
+                                y0=0,
+                                x1=1,
+                                y1=1,
+                                line=dict(
+                                    color="blue",
+                                    width=2,
+                                ),
+                            )
+                        ],
+                        height=700,
+                        xaxis=dict(tickangle=-90, automargin= True)
+                    )
+                )
             )
         ])
     elif tab == 'tab5-3':
