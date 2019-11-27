@@ -229,7 +229,7 @@ def update_output(n_clicks, lines_slider, cpu):
         #if __name__ == 'app':
         if True:
 
-            rango = 100
+            rango = 10
 
             lines = lines_slider
 
