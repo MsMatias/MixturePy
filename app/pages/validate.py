@@ -233,7 +233,7 @@ def update_output(n_clicks, lines_slider, cpu):
         #if __name__ == 'app':
         if True:
 
-            rango = 10
+            rango = 500
 
             lines = lines_slider
 
@@ -290,6 +290,91 @@ def render_content2(tab):
             html.Div(id='tabs5-content')
         ])
 
+@app.callback(Output('graph1-div', 'children'),
+              [Input('drop_graph1', 'value')])
+def render_graph1 (value):
+    global result1, result2, betas, lines, estimate_lines, ids
+    count = len(result2.Subjects[0].MIXprop[0])
+    print(value)
+    if value == 'pro':
+        betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
+        betasSim = betasSim.flatten()
+        betasHat = betas.to_numpy(copy=True)
+        betasHat = betasHat.flatten()
+        mean = np.mean(betasSim - betasHat)
+        std = np.std(betasSim - betasHat)
+        xx = betasHat
+        yy = betasSim - betasHat
+    elif value == 'per':
+        betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
+        betasSim = betasSim.flatten()
+        betasHat = betas.to_numpy(copy=True)
+        betasHat = betasHat.flatten()
+        mean = np.mean(betasSim - betasHat)
+        std = np.std(betasSim - betasHat)
+        xx = [0, 100]
+        yy = 100 * np.divide(betasSim, betasHat, out=np.zeros_like(betasSim), where=betasHat!=0)
+        print(yy)
+
+    children = [        
+        dcc.Graph(
+            id='graph-3',
+            figure=go.Figure(data=go.Scatter(
+                x = xx,
+                y = yy,
+                mode='markers',
+                marker_color='rgba(0, 0, 0, .9)'
+            ),
+            layout=go.Layout(
+                    shapes=[
+                        go.layout.Shape(
+                            type="line",
+                            xref="paper",
+                            x0=0,
+                            y0=mean,
+                            x1=1,
+                            y1=mean,
+                            line=dict(
+                                color="red",
+                                width=2,
+                                dash="dashdot",
+                            ),
+                        ),
+                        go.layout.Shape(
+                            type="line",
+                            xref="paper",
+                            x0=0,
+                            y0=(mean+2*std),
+                            x1=1,
+                            y1=(mean+2*std),
+                            line=dict(
+                                color="blue",
+                                width=2,
+                                dash="dashdot",
+                            ),
+                        ),
+                        go.layout.Shape(
+                            type="line",
+                            xref="paper",
+                            x0=0,
+                            y0=(mean-2*std),
+                            x1=1,
+                            y1=(mean-2*std),
+                            line=dict(
+                                color="blue",
+                                width=2,
+                                dash="dashdot",
+                            ),
+                        )
+                    ],
+                    height=700,
+                    xaxis=dict(tickangle=-90, automargin= True)
+                )
+            )
+        )
+    ]
+    return children
+
 @app.callback(Output('tabs5-content', 'children'),
               [Input('tabs5', 'value')])
 def render_content1(tab):
@@ -302,62 +387,74 @@ def render_content1(tab):
         betasHat = betasHat.flatten()
         mean = np.mean(betasSim - betasHat)
         std = np.std(betasSim - betasHat)
-        return html.Div([
-            dcc.Graph(
-                id='graph-3',
-                figure=go.Figure(data=go.Scatter(
-                    x = betasHat,
-                    y = betasSim - betasHat,
-                    mode='markers',
-                    marker_color='rgba(0, 0, 0, .9)'
-                ),
-                layout=go.Layout(
-                        shapes=[
-                            go.layout.Shape(
-                                type="line",
-                                xref="paper",
-                                x0=0,
-                                y0=mean,
-                                x1=1,
-                                y1=mean,
-                                line=dict(
-                                    color="red",
-                                    width=2,
-                                    dash="dashdot",
+        return html.Div(            
+            children = [
+            dcc.Dropdown(
+                id='drop_graph1',
+                options=[
+                    {'label': 'Proportions', 'value': 'pro'},
+                    {'label': 'Percents', 'value': 'per'}
+                ],
+                value='pro'
+            ),
+            html.Div(id='graph1-div',
+            children = [
+                dcc.Graph(
+                    id='graph-3',
+                    figure=go.Figure(data=go.Scatter(
+                        x = betasHat,
+                        y = betasSim - betasHat,
+                        mode='markers',
+                        marker_color='rgba(0, 0, 0, .9)'
+                    ),
+                    layout=go.Layout(
+                            shapes=[
+                                go.layout.Shape(
+                                    type="line",
+                                    xref="paper",
+                                    x0=0,
+                                    y0=mean,
+                                    x1=1,
+                                    y1=mean,
+                                    line=dict(
+                                        color="red",
+                                        width=2,
+                                        dash="dashdot",
+                                    ),
                                 ),
-                            ),
-                            go.layout.Shape(
-                                type="line",
-                                xref="paper",
-                                x0=0,
-                                y0=(mean+2*std),
-                                x1=1,
-                                y1=(mean+2*std),
-                                line=dict(
-                                    color="blue",
-                                    width=2,
-                                    dash="dashdot",
+                                go.layout.Shape(
+                                    type="line",
+                                    xref="paper",
+                                    x0=0,
+                                    y0=(mean+2*std),
+                                    x1=1,
+                                    y1=(mean+2*std),
+                                    line=dict(
+                                        color="blue",
+                                        width=2,
+                                        dash="dashdot",
+                                    ),
                                 ),
-                            ),
-                            go.layout.Shape(
-                                type="line",
-                                xref="paper",
-                                x0=0,
-                                y0=(mean-2*std),
-                                x1=1,
-                                y1=(mean-2*std),
-                                line=dict(
-                                    color="blue",
-                                    width=2,
-                                    dash="dashdot",
-                                ),
-                            )
-                        ],
-                        height=700,
-                        xaxis=dict(tickangle=-90, automargin= True)
+                                go.layout.Shape(
+                                    type="line",
+                                    xref="paper",
+                                    x0=0,
+                                    y0=(mean-2*std),
+                                    x1=1,
+                                    y1=(mean-2*std),
+                                    line=dict(
+                                        color="blue",
+                                        width=2,
+                                        dash="dashdot",
+                                    ),
+                                )
+                            ],
+                            height=700,
+                            xaxis=dict(tickangle=-90, automargin= True)
+                        )
                     )
                 )
-            )
+            ])
         ])
     elif tab == 'tab5-2':      
         betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
