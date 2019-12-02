@@ -19,6 +19,8 @@ import dash_html_components as html
 import dash_table as dt
 from flask import send_file
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from sklearn.svm import NuSVR
 
 from app import app
 
@@ -36,6 +38,7 @@ betas = None
 lines = None
 estimate_lines = None
 ids = None
+score = None
 
 seed(123)
 
@@ -221,7 +224,7 @@ def update_lines(lines_slider):
      dash.dependencies.State('cpu-slider', 'value')])
 def update_output(n_clicks, lines_slider, cpu):
    
-    global signature, dataFrameSignature, result1, pValues1, tableMetrics1, result2, pValues2, tableMetrics2, subjects, betas, lines, estimate_lines, ids
+    global signature, dataFrameSignature, result1, pValues1, tableMetrics1, result2, pValues2, tableMetrics2, subjects, betas, lines, estimate_lines, ids, score
     
     if n_clicks is not None:
 
@@ -233,7 +236,7 @@ def update_output(n_clicks, lines_slider, cpu):
         #if __name__ == 'app':
         if True:
 
-            rango = 500
+            rango = 10
 
             lines = lines_slider
 
@@ -245,7 +248,7 @@ def update_output(n_clicks, lines_slider, cpu):
             X = dataFrameSignature.iloc[:, 1:]
 
             subjects = Parallel(n_jobs=cpu, backend='threading')(delayed(createBetas)(X = X, a = lines[0], b = lines[1], n = len(X.columns)) for i in range(rango))
-            
+
             # Getting expression matrix
             vector = [x[2] for x in subjects]
             columns = ['V' + str(x+1) for x in range(len(subjects))]
@@ -260,12 +263,17 @@ def update_output(n_clicks, lines_slider, cpu):
             X = dataFrameSignature
 
             result2, pValues2 = Mixture.Mixture(X, Y2 , cpu, 1, '') 
+
+            clf = NuSVR(kernel='linear', C=1.0, nu=[0.25,0.5,0.75])
+            score = clf.score(X, Y2)
+            print(score)
+            
             betasSim = result2.Subjects[0].MIXprop[0].to_numpy(copy = True)           
             estimate_lines = pd.DataFrame([(betasSim[i] > 0).sum() for i in range(rango)])     
             metrics2 = result2.Subjects[0].ACCmetrix[0].reset_index()
 
             vector = [len(x[1]) for x in subjects]
-            ids = pd.DataFrame(np.column_stack(vector))
+            ids = pd.DataFrame(np.column_stack(vector))            
             
         children = [            
             dcc.Tabs(id='tabs4', value='tab4-1', children=[
@@ -295,82 +303,82 @@ def render_content2(tab):
 def render_graph1 (value):
     global result1, result2, betas, lines, estimate_lines, ids
     count = len(result2.Subjects[0].MIXprop[0])
-    print(value)
-    if value == 'pro':
-        betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
-        betasSim = betasSim.flatten()
-        betasHat = betas.to_numpy(copy=True)
-        betasHat = betasHat.flatten()
-        mean = np.mean(betasSim - betasHat)
-        std = np.std(betasSim - betasHat)
+    betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
+    betasSim = betasSim.flatten()
+    betasHat = betas.to_numpy(copy=True)
+    betasHat = betasHat.flatten()
+    mean = np.mean(betasSim - betasHat)
+    std = np.std(betasSim - betasHat)
+    if value == 'pro':                
         xx = betasHat
         yy = betasSim - betasHat
-    elif value == 'per':
-        betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
-        betasSim = betasSim.flatten()
-        betasHat = betas.to_numpy(copy=True)
-        betasHat = betasHat.flatten()
-        mean = np.mean(betasSim - betasHat)
-        std = np.std(betasSim - betasHat)
-        xx = [0, 100]
-        yy = 100 * np.divide(betasSim, betasHat, out=np.zeros_like(betasSim), where=betasHat!=0)
-        print(yy)
+    elif value == 'per':        
+        xx = betasHat
+        m = (betasSim + betasHat)/2
+        yy = (betasSim - betasHat)
+        yy = 100 * np.divide(yy, m, out=np.zeros_like(yy), where=m!=0)
 
-    children = [        
-        dcc.Graph(
-            id='graph-3',
-            figure=go.Figure(data=go.Scatter(
+    
+    print(r2_score(betasHat, betasSim, multioutput=None))
+    
+    fig = make_subplots(rows=1, cols=2, column_widths=[0.7, 0.3], shared_yaxes=True)
+    fig.add_trace(go.Scatter(
                 x = xx,
                 y = yy,
                 mode='markers',
                 marker_color='rgba(0, 0, 0, .9)'
+                ),row=1, col=1)
+    fig.add_trace(go.Violin(y=yy, box_visible=True, line_color='black',
+                               meanline_visible=True, fillcolor='lightseagreen', opacity=0.6,
+                               x0='Total Bill'),row=1, col=2)
+
+                               
+    fig['layout'].update(shapes=[
+        go.layout.Shape(
+            type="line",
+            xref="x1",
+            x0=0,
+            y0=mean,
+            x1=1,
+            y1=mean,
+            line=dict(
+                color="red",
+                width=2,
+                dash="dashdot",
+                ),
+        ),
+        go.layout.Shape(
+            type="line",
+            xref="x1",
+            x0=0,
+            y0=(mean+2*std),
+            x1=1,
+            y1=(mean+2*std),
+            line=dict(
+                color="blue",
+                width=2,
+                dash="dashdot",
             ),
-            layout=go.Layout(
-                    shapes=[
-                        go.layout.Shape(
-                            type="line",
-                            xref="paper",
-                            x0=0,
-                            y0=mean,
-                            x1=1,
-                            y1=mean,
-                            line=dict(
-                                color="red",
-                                width=2,
-                                dash="dashdot",
-                            ),
-                        ),
-                        go.layout.Shape(
-                            type="line",
-                            xref="paper",
-                            x0=0,
-                            y0=(mean+2*std),
-                            x1=1,
-                            y1=(mean+2*std),
-                            line=dict(
-                                color="blue",
-                                width=2,
-                                dash="dashdot",
-                            ),
-                        ),
-                        go.layout.Shape(
-                            type="line",
-                            xref="paper",
-                            x0=0,
-                            y0=(mean-2*std),
-                            x1=1,
-                            y1=(mean-2*std),
-                            line=dict(
-                                color="blue",
-                                width=2,
-                                dash="dashdot",
-                            ),
-                        )
-                    ],
-                    height=700,
-                    xaxis=dict(tickangle=-90, automargin= True)
-                )
-            )
+        ),
+        go.layout.Shape(
+            type="line",
+            xref="x1",
+            x0=0,
+            y0=(mean-2*std),
+            x1=1,
+            y1=(mean-2*std),
+            line=dict(
+                color="blue",
+                width=2,
+                dash="dashdot",
+            ),
+        )
+    ])
+
+    children = [        
+        dcc.Graph(
+            id='graph-3',
+            figure=fig
         )
     ]
     return children
