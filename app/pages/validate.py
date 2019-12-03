@@ -20,7 +20,7 @@ import dash_table as dt
 from flask import send_file
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from sklearn.svm import NuSVR
+from scipy import stats
 
 from app import app
 
@@ -38,7 +38,6 @@ betas = None
 lines = None
 estimate_lines = None
 ids = None
-score = None
 
 seed(123)
 
@@ -224,7 +223,7 @@ def update_lines(lines_slider):
      dash.dependencies.State('cpu-slider', 'value')])
 def update_output(n_clicks, lines_slider, cpu):
    
-    global signature, dataFrameSignature, result1, pValues1, tableMetrics1, result2, pValues2, tableMetrics2, subjects, betas, lines, estimate_lines, ids, score
+    global signature, dataFrameSignature, result1, pValues1, tableMetrics1, result2, pValues2, tableMetrics2, subjects, betas, lines, estimate_lines, ids
     
     if n_clicks is not None:
 
@@ -236,7 +235,7 @@ def update_output(n_clicks, lines_slider, cpu):
         #if __name__ == 'app':
         if True:
 
-            rango = 10
+            rango = 1000
 
             lines = lines_slider
 
@@ -263,10 +262,6 @@ def update_output(n_clicks, lines_slider, cpu):
             X = dataFrameSignature
 
             result2, pValues2 = Mixture.Mixture(X, Y2 , cpu, 1, '') 
-
-            clf = NuSVR(kernel='linear', C=1.0, nu=[0.25,0.5,0.75])
-            score = clf.score(X, Y2)
-            print(score)
             
             betasSim = result2.Subjects[0].MIXprop[0].to_numpy(copy = True)           
             estimate_lines = pd.DataFrame([(betasSim[i] > 0).sum() for i in range(rango)])     
@@ -318,9 +313,8 @@ def render_graph1 (value):
         yy = (betasSim - betasHat)
         yy = 100 * np.divide(yy, m, out=np.zeros_like(yy), where=m!=0)
 
-    
-    print(r2_score(betasHat, betasSim, multioutput=None))
-    
+    slope, intercept, r_value, p_value, std_err = stats.linregress(xx, yy)
+
     fig = make_subplots(rows=1, cols=2, column_widths=[0.7, 0.3], shared_yaxes=True)
     fig.add_trace(go.Scatter(
                 x = xx,
@@ -328,12 +322,17 @@ def render_graph1 (value):
                 mode='markers',
                 marker_color='rgba(0, 0, 0, .9)'
                 ),row=1, col=1)
+    fig.add_trace(go.Scatter(x=xx, y=intercept + slope*xx,
+                    mode='lines',
+                    name='lines'),row=1, col=1)
     fig.add_trace(go.Violin(y=yy, box_visible=True, line_color='black',
-                               meanline_visible=True, fillcolor='lightseagreen', opacity=0.6,
-                               x0='Total Bill'),row=1, col=2)
+                               meanline_visible=True, fillcolor='blue', opacity=0.8,
+                               x0='Violin'),row=1, col=2)
 
                                
-    fig['layout'].update(shapes=[
+    fig['layout'].update(
+        height=700,
+        shapes=[
         go.layout.Shape(
             type="line",
             xref="x1",
@@ -394,7 +393,8 @@ def render_content1(tab):
         betasHat = betas.to_numpy(copy=True)
         betasHat = betasHat.flatten()
         mean = np.mean(betasSim - betasHat)
-        std = np.std(betasSim - betasHat)
+        std = np.std(betasSim - betasHat)        
+
         return html.Div(            
             children = [
             dcc.Dropdown(
@@ -405,79 +405,27 @@ def render_content1(tab):
                 ],
                 value='pro'
             ),
-            html.Div(id='graph1-div',
-            children = [
-                dcc.Graph(
-                    id='graph-3',
-                    figure=go.Figure(data=go.Scatter(
-                        x = betasHat,
-                        y = betasSim - betasHat,
-                        mode='markers',
-                        marker_color='rgba(0, 0, 0, .9)'
-                    ),
-                    layout=go.Layout(
-                            shapes=[
-                                go.layout.Shape(
-                                    type="line",
-                                    xref="paper",
-                                    x0=0,
-                                    y0=mean,
-                                    x1=1,
-                                    y1=mean,
-                                    line=dict(
-                                        color="red",
-                                        width=2,
-                                        dash="dashdot",
-                                    ),
-                                ),
-                                go.layout.Shape(
-                                    type="line",
-                                    xref="paper",
-                                    x0=0,
-                                    y0=(mean+2*std),
-                                    x1=1,
-                                    y1=(mean+2*std),
-                                    line=dict(
-                                        color="blue",
-                                        width=2,
-                                        dash="dashdot",
-                                    ),
-                                ),
-                                go.layout.Shape(
-                                    type="line",
-                                    xref="paper",
-                                    x0=0,
-                                    y0=(mean-2*std),
-                                    x1=1,
-                                    y1=(mean-2*std),
-                                    line=dict(
-                                        color="blue",
-                                        width=2,
-                                        dash="dashdot",
-                                    ),
-                                )
-                            ],
-                            height=700,
-                            xaxis=dict(tickangle=-90, automargin= True)
-                        )
-                    )
-                )
-            ])
+            html.Div(id='graph1-div')
         ])
     elif tab == 'tab5-2':      
         betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
         betasSim = betasSim.flatten()
         betasHat = betas.to_numpy(copy=True)
         betasHat = betasHat.flatten()
+        slope, intercept, r_value, p_value, std_err = stats.linregress(betasHat, betasSim)
         return html.Div([
             dcc.Graph(
                 id='graph-3',
-                figure=go.Figure(data=go.Scatter(
+                figure=go.Figure(data=[go.Scatter(
                     x = betasHat,
                     y = betasSim,
                     mode='markers',
                     marker_color='rgba(0, 0, 0, .9)'
                 ),
+                go.Scatter(x=betasHat, y=intercept + slope*betasHat,
+                    mode='lines',
+                    name='lines')
+                ],
                 layout=go.Layout(
                         shapes=[
                             go.layout.Shape(

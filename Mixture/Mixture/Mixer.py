@@ -69,4 +69,4 @@ def Mixer(X, Y, cores):
 
     matRes.index = matWp.index.values
 
-    return(pd.DataFrame([[matWa, matWp, matRes]], columns=['MIXabs', 'MIXprop', 'ACCmetrix']))
+    return (pd.DataFrame([[matWa, matWp, matRes]], columns=['MIXabs', 'MIXprop', 'ACCmetrix']))

@@ -1,6 +1,6 @@
-joblib
-numpy
-openpyxl
 pandas
+numpy
 scikit-learn
+joblib
 xlrd
+openpyxl
