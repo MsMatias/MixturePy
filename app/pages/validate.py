@@ -38,6 +38,7 @@ betas = None
 lines = None
 estimate_lines = None
 ids = None
+result3 = None
 
 seed(123)
 
@@ -220,10 +221,11 @@ def update_lines(lines_slider):
     Output("loading-output-result", "children"),
     [dash.dependencies.Input('button_validate', 'n_clicks')],
     [dash.dependencies.State('lines_slider', 'value'),
-     dash.dependencies.State('cpu-slider', 'value')])
-def update_output(n_clicks, lines_slider, cpu):
+     dash.dependencies.State('cpu-slider', 'value'),
+     dash.dependencies.State('check_celllines', 'value')])
+def update_output(n_clicks, lines_slider, cpu, celllines):
    
-    global signature, dataFrameSignature, result1, pValues1, tableMetrics1, result2, pValues2, tableMetrics2, subjects, betas, lines, estimate_lines, ids
+    global signature, dataFrameSignature, result1, pValues1, tableMetrics1, result2, pValues2, tableMetrics2, subjects, betas, lines, estimate_lines, ids, result3
     
     if n_clicks is not None:
 
@@ -268,12 +270,32 @@ def update_output(n_clicks, lines_slider, cpu):
             metrics2 = result2.Subjects[0].ACCmetrix[0].reset_index()
 
             vector = [len(x[1]) for x in subjects]
-            ids = pd.DataFrame(np.column_stack(vector))            
+            ids = pd.DataFrame(np.column_stack(vector))   
+
+            #Celllines analysis
+            if celllines[0] == 'cellines':
+                #Y3 = pd.read_excel(dataCelllines, sheet_name = 0)
+                #result3, pValues3 = Mixture.Mixture(X, Y3 , cpu, 1, '')
+                cc = pd.read_excel('../data/outputCellines.xlsx', sheet_name = 0) 
+                cc.index = cc.iloc[:,0].astype(int)
+                cc.index.name = 'Subjects'
+                result3 = cc.iloc[:, 1:]
+                children_tabs = [
+                    dcc.Tab(label='Similation Test', value='tab4-1', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+                    dcc.Tab(label='False Discovery Test', value='tab4-2', style={'padding': '0px'}, selected_style={'padding': '0px'})
+                ]
+            else:
+                children_tabs = [
+                    dcc.Tab(label='Similation Test', value='tab4-1', style={'padding': '0px'}, selected_style={'padding': '0px'})
+                ]
             
         children = [            
             dcc.Tabs(id='tabs4', value='tab4-1', children=[
-                dcc.Tab(label='Similation Test', value='tab4-1'),
-            ]),
+                dcc.Tab(label='Similation Test', value='tab4-1', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+                dcc.Tab(label='False Discovery Test', value='tab4-2', style={'padding': '0px'}, selected_style={'padding': '0px'})
+            ], style={
+                'height': '35px'
+            }),
             html.Div(id='tabs4-content')
         ]
         
@@ -284,13 +306,25 @@ def update_output(n_clicks, lines_slider, cpu):
 def render_content2(tab):
     if tab == 'tab4-1':
         return html.Div([
-            dcc.Tabs(id='tabs5', value='tab5-3', children=[
-                dcc.Tab(label='Bland-Altman analysis', value='tab5-1'),
-                dcc.Tab(label='Correlation analysis', value='tab5-2'),
-                dcc.Tab(label='Self test', value='tab5-3'),
-                dcc.Tab(label='Number of Cell types', value='tab5-4'),
-            ]),
+            dcc.Tabs(id='tabs5', value='tab5-1', children=[
+                dcc.Tab(label='Bland-Altman analysis', value='tab5-1', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+                dcc.Tab(label='Correlation analysis', value='tab5-2', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+                dcc.Tab(label='Self test', value='tab5-3', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+                dcc.Tab(label='Number of Cell types', value='tab5-4', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+            ], style={
+                'height': '35px'
+            }),            
             html.Div(id='tabs5-content')
+        ])
+    elif tab == 'tab4-2':
+        return html.Div([
+            dcc.Tabs(id='tabs6', value='tab6-2', children=[
+                dcc.Tab(label='Number of Cell types', value='tab6-1', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+                dcc.Tab(label='Absolute Beta Estimation', value='tab6-2', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+            ], style={
+                'height': '35px'
+            }),            
+            html.Div(id='tabs6-content')
         ])
 
 @app.callback(Output('graph1-div', 'children'),
@@ -397,7 +431,7 @@ def render_content1(tab):
 
         return html.Div(            
             children = [
-            dcc.Dropdown(
+            dcc.RadioItems(
                 id='drop_graph1',
                 options=[
                     {'label': 'Proportions', 'value': 'pro'},
@@ -476,6 +510,28 @@ def render_content1(tab):
                     layout=go.Layout(
                         height=700,
                         xaxis=dict(tickangle=0, automargin= True)
+                    )
+                )
+            )
+        ])
+
+@app.callback(Output('tabs6-content', 'children'),
+              [Input('tabs6', 'value')])
+def render_content1(tab):
+    global result3
+    estimate_lines = pd.DataFrame([(betasSim[i] > 0).sum() for i in range(rango)])    
+    if tab == 'tab6-2':
+        items = [go.Box(y=result3.iloc[:, j], name = result3.iloc[:, j].name) for j in range(len(result3.columns))]
+        #items = [go.Violin(y=yy, box_visible=True, line_color='black',
+        #                       meanline_visible=True, fillcolor='blue', opacity=0.8,
+        #                       x0='Violin')]
+        return html.Div([
+            dcc.Graph(
+                id='graph-abe',
+                figure=go.Figure(data=items,
+                    layout=go.Layout(
+                        height=700,
+                        xaxis=dict(tickangle=-90, automargin= True)
                     )
                 )
             )

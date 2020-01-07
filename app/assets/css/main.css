@@ -488,3 +488,23 @@ nav ul {
 	left: 3px;
 	color:#ffffff;
 }
+
+#drop_graph1 input[type="radio"]:active, #drop_graph1 input[type="radio"]:checked:active {
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+}
+
+#drop_graph1 input[type="radio"]:checked {
+	background-color: #33C3F0;
+	border: 1px solid #555;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
+	color: #33C3F0;
+}
+
+#drop_graph1 input[type="radio"]:checked:after {
+	content: '\2714';
+	font-size: 14px;
+	position: absolute;
+	top: 0px;
+	left: 3px;
+	color:#ffffff;
+}

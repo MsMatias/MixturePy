@@ -9,7 +9,7 @@ options = {
             'cx_Logging', 'idna',
         ],
         'packages': [
-            'asyncio', 'flask', 'jinja2', 'dash', 'plotly', 'waitress', 'scipy.signal', 'scipy.sparse',  'scipy.integrate', 'xlsxwriter'
+            'asyncio', 'flask', 'jinja2', 'dash', 'plotly', 'waitress', 'scipy.signal', 'scipy.sparse',  'scipy.integrate', 'xlsxwriter', 'numpy'
         ],
         'excludes': [
             'tkinter', 'scipy.spatial.cKDTree'
