@@ -237,7 +237,7 @@ def update_output(n_clicks, lines_slider, cpu, celllines):
         #if __name__ == 'app':
         if True:
 
-            rango = 10
+            rango = 1000
 
             lines = lines_slider
 
@@ -273,16 +273,13 @@ def update_output(n_clicks, lines_slider, cpu, celllines):
             ids = pd.DataFrame(np.column_stack(vector))   
 
             #Celllines analysis
-            if len(celllines) == 1:
+            if celllines[0] == 'cellines':
                 #Y3 = pd.read_excel(dataCelllines, sheet_name = 0)
                 #result3, pValues3 = Mixture.Mixture(X, Y3 , cpu, 1, '')
-                cc = pd.read_excel('./data/outputCellines(2).xlsx', sheet_name = 0) 
+                cc = pd.read_excel('../data/outputCellines.xlsx', sheet_name = 0) 
                 cc.index = cc.iloc[:,0].astype(int)
                 cc.index.name = 'Subjects'
-                cc2 = pd.read_excel('./data/outputCellines(2).xlsx', sheet_name = 1)
-                cc2.index = cc2.iloc[:,0].astype(int)
-                cc2.index.name = 'Subjects'
-                result3 = [cc.iloc[:, 1:], cc2.iloc[:, 1:]]
+                result3 = cc.iloc[:, 1:]
                 children_tabs = [
                     dcc.Tab(label='Similation Test', value='tab4-1', style={'padding': '0px'}, selected_style={'padding': '0px'}),
                     dcc.Tab(label='False Discovery Test', value='tab4-2', style={'padding': '0px'}, selected_style={'padding': '0px'})
@@ -301,224 +298,41 @@ def update_output(n_clicks, lines_slider, cpu, celllines):
             }),
             html.Div(id='tabs4-content')
         ]
-
-        children = []
-
-
-        # Similation Test
-        children.append(html.H1('Similation Test'))
-
-        # Bland Altman analysis
-
-        # Proportions
-        children.append(blandAltmanGraph(result2.Subjects[0].MIXprop[0], 'pro'))
-
-        # Absolute
-        children.append(blandAltmanGraph(result2.Subjects[0].MIXprop[0], 'per'))
         
-        # Correlation analysis
-        children.append(correlationAnalysisGraph(result2.Subjects[0].MIXprop[0]))
-
-        # Self Test
-        children.append(selfTestGraph(result1.Subjects[0].MIXprop[0]))
-
-        # Number of Cell Types
-        children.append(numberOfCellTypeGraph(estimate_lines, ids))
-
-        if len(celllines) == 1:
-
-            # False Discovery Test
-            children.append(html.H1('False Discovery Test'))
-
-            # Number of Cell Types
-            children.append(numberOfCellTypeFDTGraph(result3[1]))
-
-            # Absolute Beta Estimation
-            children.append(absoluteBetaEstimation(result3[0]))
-
         return children
 
-def numberOfCellTypeGraph (data, ids):
-    items = [go.Box(y=data[(ids.values == j)[0]][0], name = str(j)) for j in range(lines[0],lines[1])]        
-    return html.Div([
-        html.Hr(),
-        dcc.Graph(
-            id='graph-3',
-            figure=go.Figure(data=items,
-                layout=go.Layout(
-                    title=go.layout.Title(
-                        text= "Number of Cell Types",
-                        font=dict(
-                            family='Courier New, monospace',
-                            size=20,
-                            color='#000000'
-                        ),
-                        y=0.9,
-                        x=0.5,
-                        xanchor= 'center',
-                        yanchor= 'top'
-                    ),
-                    xaxis=go.layout.XAxis(
-                        title=go.layout.xaxis.Title(
-                            text='True number of coefficients',
-                            font=dict(
-                                family='Courier New, monospace',
-                                size=14,
-                                color='#7f7f7f'
-                            )
-                        ),
-                        tickangle=0,
-                        automargin= True
-                    ),
-                    yaxis=go.layout.YAxis(
-                        title=go.layout.yaxis.Title(
-                            text='Estimated number of coefficients',
-                            font=dict(
-                                family='Courier New, monospace',
-                                size=14,
-                                color='#7f7f7f'
-                            )
-                        )
-                    ),
-                    height=700,
-                )
-            )
-        )
-    ])
+@app.callback(Output('tabs4-content', 'children'),
+              [Input('tabs4', 'value')])
+def render_content2(tab):
+    if tab == 'tab4-1':
+        return html.Div([
+            dcc.Tabs(id='tabs5', value='tab5-1', children=[
+                dcc.Tab(label='Bland-Altman analysis', value='tab5-1', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+                dcc.Tab(label='Correlation analysis', value='tab5-2', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+                dcc.Tab(label='Self test', value='tab5-3', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+                dcc.Tab(label='Number of Cell types', value='tab5-4', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+            ], style={
+                'height': '35px'
+            }),            
+            html.Div(id='tabs5-content')
+        ])
+    elif tab == 'tab4-2':
+        return html.Div([
+            dcc.Tabs(id='tabs6', value='tab6-2', children=[
+                dcc.Tab(label='Number of Cell types', value='tab6-1', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+                dcc.Tab(label='Absolute Beta Estimation', value='tab6-2', style={'padding': '0px'}, selected_style={'padding': '0px'}),
+            ], style={
+                'height': '35px'
+            }),            
+            html.Div(id='tabs6-content')
+        ])
 
-def selfTestGraph (data):
-    items = [data.iloc[j].values for j in range(len(data))]        
-    return html.Div([
-        html.Hr(),
-        dcc.Graph(
-            id='graph-3',
-            figure=go.Figure(data=go.Heatmap(
-                z=np.transpose(items),
-                x=data.index,
-                y=data.columns,
-                colorscale= [
-                    [0.0, 'rgb(255,255,255)'],
-                    [1.0, 'rgb(255,0,0)']
-                ]
-            ),
-                layout=go.Layout(
-                    title=go.layout.Title(
-                        text= "Self Test",
-                        font=dict(
-                            family='Courier New, monospace',
-                            size=20,
-                            color='#000000'
-                        ),
-                        y=0.9,
-                        x=0.5,
-                        xanchor= 'center',
-                        yanchor= 'top'
-                    ),
-                    xaxis=go.layout.XAxis(
-                        title=go.layout.xaxis.Title(
-                            text='Estimated Immune Cell Types',
-                            font=dict(
-                                family='Courier New, monospace',
-                                size=14,
-                                color='#7f7f7f'
-                            )
-                        ),
-                        tickangle=-90,
-                        automargin= True
-                    ),
-                    yaxis=go.layout.YAxis(
-                        title=go.layout.yaxis.Title(
-                            text='True Immune Cell Types present in the Signature Matrix',
-                            font=dict(
-                                family='Courier New, monospace',
-                                size=14,
-                                color='#7f7f7f'
-                            )
-                        )
-                    ),
-                    height=700
-                )
-            )
-        )
-    ])
-
-def correlationAnalysisGraph (data):
-    betasSim = data.T.to_numpy(copy=True)
-    betasSim = betasSim.flatten()
-    betasHat = betas.to_numpy(copy=True)
-    betasHat = betasHat.flatten()
-    slope, intercept, r_value, p_value, std_err = stats.linregress(betasHat, betasSim)
-    return html.Div([
-        html.Hr(),
-        dcc.Graph(
-            id='graph-3',
-            figure=go.Figure(data=[go.Scattergl(
-                x = betasHat,
-                y = betasSim,
-                mode='markers',
-                marker_color='rgba(0, 0, 0, .9)'
-            ),
-            go.Scatter(x=betasHat, y=intercept + slope*betasHat,
-                mode='lines',
-                name='lines')
-            ],
-            layout=go.Layout(
-                    shapes=[
-                        go.layout.Shape(
-                            type="line",
-                            x0=0,
-                            y0=0,
-                            x1=1,
-                            y1=1,
-                            line=dict(
-                                color="blue",
-                                width=2,
-                            ),
-                        )
-                    ],
-                    title=go.layout.Title(
-                        text= "Correlation Analysis",
-                        font=dict(
-                                family='Courier New, monospace',
-                                size=20,
-                                color='#000000'
-                        ),
-                        y=0.9,
-                        x=0.5,
-                        xanchor= 'center',
-                        yanchor= 'top'
-                    ),
-                    xaxis=go.layout.XAxis(
-                        title=go.layout.xaxis.Title(
-                            text='True Simulated Coefficient',
-                            font=dict(
-                                family='Courier New, monospace',
-                                size=14,
-                                color='#7f7f7f'
-                            )
-                        ),
-                        tickangle=-90,
-                        automargin= True
-                    ),
-                    yaxis=go.layout.YAxis(
-                        title=go.layout.yaxis.Title(
-                            text='Estimated Coefficients',
-                            font=dict(
-                                family='Courier New, monospace',
-                                size=14,
-                                color='#7f7f7f'
-                            )
-                        )
-                    ),
-                    height=700
-                )
-            )
-        )
-    ])
-
-def blandAltmanGraph (data, value):
-    count = len(data)
-    betasSim = data.T.to_numpy(copy=True)
+@app.callback(Output('graph1-div', 'children'),
+              [Input('drop_graph1', 'value')])
+def render_graph1 (value):
+    global result1, result2, betas, lines, estimate_lines, ids
+    count = len(result2.Subjects[0].MIXprop[0])
+    betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
     betasSim = betasSim.flatten()
     betasHat = betas.to_numpy(copy=True)
     betasHat = betasHat.flatten()
@@ -536,13 +350,13 @@ def blandAltmanGraph (data, value):
     slope, intercept, r_value, p_value, std_err = stats.linregress(xx, yy)
 
     fig = make_subplots(rows=1, cols=2, column_widths=[0.7, 0.3], shared_yaxes=True)
-    fig.add_trace(go.Scattergl(
+    fig.add_trace(go.Scatter(
                 x = xx,
                 y = yy,
                 mode='markers',
                 marker_color='rgba(0, 0, 0, .9)'
                 ),row=1, col=1)
-    fig.add_trace(go.Scattergl(x=xx, y=intercept + slope*xx,
+    fig.add_trace(go.Scatter(x=xx, y=intercept + slope*xx,
                     mode='lines',
                     name='lines'),row=1, col=1)
     fig.add_trace(go.Violin(y=yy, box_visible=True, line_color='black',
@@ -551,21 +365,6 @@ def blandAltmanGraph (data, value):
 
                                
     fig['layout'].update(
-        title_text="Bland-Altman Analysis",
-        title_font_family='Courier New, monospace',
-        title_font_size=20,
-        title_font_color='#000000',
-        title_xanchor='center',
-        title_yanchor = 'top',
-        title_x = 0.5,
-        title_y = 0.9,
-        xaxis_title='Estimated Coefficients',
-        yaxis_title='Error',
-        font=dict(
-            family="Courier New, monospace",
-            size=14,
-            color="#7f7f7f"
-        ),
         height=700,
         shapes=[
         go.layout.Shape(
@@ -609,59 +408,92 @@ def blandAltmanGraph (data, value):
         )
     ])
 
-            
-    return dcc.Graph(
-        id='graph-3',
-        figure=fig
-        )
-
-def numberOfCellTypeFDTGraph (data):
-    dfSum = data.sum(axis=1)
-    dfSum = dfSum.where(dfSum > 0).notna()
-    lines = data[dfSum]
-    items = [go.Violin(y=lines.iloc[:, j], name = lines.iloc[:, j].name) for j in range(len(lines.columns))]
-    return html.Div([
+    children = [        
         dcc.Graph(
-            id='graph-abe',
-            figure=go.Figure(data=items,
-                layout=go.Layout(
-                    height=700,
-                    xaxis=dict(tickangle=-90, automargin= True)
-                )
-            )
+            id='graph-3',
+            figure=fig
         )
-    ])
+    ]
+    return children
 
-def absoluteBetaEstimation (data):
-    items = go.Box(y=data.values.flatten(), name = 1)
-        
-    return html.Div([
-        dcc.Graph(
-            id='graph-abe',
-            figure=go.Figure(data=items,
-                layout=go.Layout(
-                    height=700,
-                    xaxis=dict(tickangle=-90, automargin= True)
-                )
-            )
-        )
-    ])
-
-@app.callback(Output('tabs6-content', 'children'),
-              [Input('tabs6', 'value')])
+@app.callback(Output('tabs5-content', 'children'),
+              [Input('tabs5', 'value')])
 def render_content1(tab):
-    global result3
-    dfSum = result3[1].sum(axis=1)
-    dfSum = dfSum.where(dfSum > 0).notna()
-    lines = result3[1][dfSum]
-    
-    if tab == 'tab6-2':
-        items = go.Box(y=result3[0].values.flatten(), name = 1)
-        
+    global result1, result2, betas, lines, estimate_lines, ids
+    count = len(result2.Subjects[0].MIXprop[0])
+    if tab == 'tab5-1':      
+        betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
+        betasSim = betasSim.flatten()
+        betasHat = betas.to_numpy(copy=True)
+        betasHat = betasHat.flatten()
+        mean = np.mean(betasSim - betasHat)
+        std = np.std(betasSim - betasHat)        
+
+        return html.Div(            
+            children = [
+            dcc.RadioItems(
+                id='drop_graph1',
+                options=[
+                    {'label': 'Proportions', 'value': 'pro'},
+                    {'label': 'Percents', 'value': 'per'}
+                ],
+                value='pro'
+            ),
+            html.Div(id='graph1-div')
+        ])
+    elif tab == 'tab5-2':      
+        betasSim = result2.Subjects[0].MIXprop[0].T.to_numpy(copy=True)
+        betasSim = betasSim.flatten()
+        betasHat = betas.to_numpy(copy=True)
+        betasHat = betasHat.flatten()
+        slope, intercept, r_value, p_value, std_err = stats.linregress(betasHat, betasSim)
         return html.Div([
             dcc.Graph(
-                id='graph-abe',
-                figure=go.Figure(data=items,
+                id='graph-3',
+                figure=go.Figure(data=[go.Scatter(
+                    x = betasHat,
+                    y = betasSim,
+                    mode='markers',
+                    marker_color='rgba(0, 0, 0, .9)'
+                ),
+                go.Scatter(x=betasHat, y=intercept + slope*betasHat,
+                    mode='lines',
+                    name='lines')
+                ],
+                layout=go.Layout(
+                        shapes=[
+                            go.layout.Shape(
+                                type="line",
+                                x0=0,
+                                y0=0,
+                                x1=1,
+                                y1=1,
+                                line=dict(
+                                    color="blue",
+                                    width=2,
+                                ),
+                            )
+                        ],
+                        height=700,
+                        xaxis=dict(tickangle=-90, automargin= True)
+                    )
+                )
+            )
+        ])
+    elif tab == 'tab5-3':
+        items = [result1.Subjects[0].MIXprop[0].iloc[j].values for j in range(len(result1.Subjects[0].MIXprop[0]))]        
+        return html.Div([
+            dcc.Graph(
+                id='graph-3',
+                figure=go.Figure(data=go.Heatmap(
+                    z=np.transpose(items),
+                    x=result1.Subjects[0].MIXprop[0].index,
+                    y=result1.Subjects[0].MIXprop[0].columns,
+                    colorscale= [
+                        [0.0, 'rgb(255,255,255)'],
+                        [1.0, 'rgb(255,0,0)']
+                    ]
+                ),
                     layout=go.Layout(
                         height=700,
                         xaxis=dict(tickangle=-90, automargin= True)
@@ -669,8 +501,30 @@ def render_content1(tab):
                 )
             )
         ])
-    elif tab == 'tab6-1':
-        items = [go.Violin(y=lines.iloc[:, j], name = lines.iloc[:, j].name) for j in range(len(lines.columns))]
+    elif tab == 'tab5-4':
+        items = [go.Box(y=estimate_lines[(ids.values == j)[0]][0], name = str(j)) for j in range(lines[0],lines[1])]        
+        return html.Div([
+            dcc.Graph(
+                id='graph-3',
+                figure=go.Figure(data=items,
+                    layout=go.Layout(
+                        height=700,
+                        xaxis=dict(tickangle=0, automargin= True)
+                    )
+                )
+            )
+        ])
+
+@app.callback(Output('tabs6-content', 'children'),
+              [Input('tabs6', 'value')])
+def render_content1(tab):
+    global result3
+    estimate_lines = pd.DataFrame([(betasSim[i] > 0).sum() for i in range(rango)])    
+    if tab == 'tab6-2':
+        items = [go.Box(y=result3.iloc[:, j], name = result3.iloc[:, j].name) for j in range(len(result3.columns))]
+        #items = [go.Violin(y=yy, box_visible=True, line_color='black',
+        #                       meanline_visible=True, fillcolor='blue', opacity=0.8,
+        #                       x0='Violin')]
         return html.Div([
             dcc.Graph(
                 id='graph-abe',
