@@ -13,10 +13,10 @@ Y = pd.read_excel('data/TIL10_signature.xlsx', sheet_name = 0)
 cores = 8
 
 # Number of permutation samples
-iters = 100
+iters = 2
 
 # Name the output file xlsx (without format)
-output = 'Result_TIL10_TIL10_Mixture_2'
+output = 'Result_TIL10_TIL10_Mixture_3'
 
 # Run Mixer Function
 if __name__ == '__main__':
