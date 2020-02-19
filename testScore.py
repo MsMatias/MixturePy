@@ -8,16 +8,18 @@ import score
 X = pd.read_excel('data/TIL9_signature.xlsx', sheet_name = 0)
 
 # Read xlsx expression file
-Y = pd.read_excel('data/TIL9_signature.xlsx', sheet_name = 0) 
+Y = pd.read_excel('data/Celllines.xlsx', sheet_name = 0)
+
+Y = Y.iloc[: , 1:]
 
 # Number of cores that will work
-cores = 8
+cores = 24
 
 # Number of permutation samples
 iters = 1000
 
 # Name the output file xlsx (without format)
-output = 'Result_TIL9_TIL9'
+output = 'Result_Celllines_TIL9'
 
 # Run Mixer Function
 if __name__ == '__main__':
