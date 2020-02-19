@@ -1,7 +1,0 @@
-dash
-dash-core-components
-dash-html-components
-cx_Freeze
-cx_Logging
-waitress
-Mixture
