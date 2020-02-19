@@ -4,13 +4,15 @@ from sklearn.svm import LinearSVR
 from sklearn.datasets import make_regression
 import random, math
 from joblib import Parallel, delayed
+from sklearn.preprocessing import scale
+import multiprocessing
 
 def Score (X, Y, cores):
 
     # Normalize signature Matrix
-    #mean = X.iloc[:, 1:].mean()
-    #std = X.iloc[:, 1:].stack().std()
-    #X.iloc[:, 1:] = (X.iloc[:, 1:] - mean.mean()) / std
+    mean = X.iloc[:, 1:].mean()
+    std = X.iloc[:, 1:].stack().std()
+    X.iloc[:, 1:] = (X.iloc[:, 1:] - mean.mean()) / std
 
     # Intersection between X and Y
     X = X.loc[X['Gene symbol'].isin(Y['Gene symbol'])]
@@ -24,13 +26,13 @@ def Score (X, Y, cores):
     Y = Y.iloc[:, 1:]
     X.reset_index(drop=True, inplace=True)
 
-    #Yn = pd.DataFrame(scale(Y), index=Y.index, columns=Y.columns)
-    Yn = Y
+    Yn = pd.DataFrame(scale(Y), index=Y.index, columns=Y.columns)
+    #Yn = Y
 
     score_adj = list()
     print('Processing...')
 
-    score_adj = Parallel(n_jobs=cores, backend='threading')(delayed(proccessData)(X = X, Y = j, subject = i, verbose = 1) for i, j in Yn.iteritems())
+    score_adj = Parallel(n_jobs=cores, backend='multiprocessing')(delayed(proccessData)(X = X, Y = j, subject = i, verbose = 1) for i, j in Yn.iteritems())
 
     matWa = pd.DataFrame()
     matWp = pd.DataFrame()
@@ -56,7 +58,10 @@ def proccessData (X, Y, subject, verbose):
 
     XX = X
 
-    svr = LinearSVR (random_state = 0)
+    if verbose == 1:
+      print('Subject ' + str(subject) + ' Processing...' + str(multiprocessing.current_process()))
+
+    svr = LinearSVR (random_state = 0, max_iter = 40000)
     model = svr.fit(X, Y)
     score = model.coef_
 
@@ -88,4 +93,8 @@ def proccessData (X, Y, subject, verbose):
     corrvW = np.corrcoef(kW, Y.values)
 
     result = pd.Series([wSel, w, nusvm, nusvmW, corrv[0][1], corrvW[0][1]], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp'])
+
+    if verbose == 1:
+      print('Finish proccess subject ' + str(subject))
+
     return result
