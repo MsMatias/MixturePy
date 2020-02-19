@@ -21,6 +21,7 @@ from flask import send_file
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from scipy import stats
+from score import Score
 
 from app import app
 
@@ -242,7 +243,7 @@ def update_output(n_clicks, lines_slider, cpu, celllines):
             lines = lines_slider
 
             # Escenario 1
-            result1, pValues1 = Mixture.Mixture(X, Y , cpu, 1, '')            
+            result1, pValues1 = Mixture.Mixture(X, Y , cpu, 1, '', method=Score)            
             metrics1 = result1.Subjects[0].ACCmetrix[0].reset_index()
 
             # Escenario 2            
@@ -263,7 +264,7 @@ def update_output(n_clicks, lines_slider, cpu, celllines):
 
             X = dataFrameSignature
 
-            result2, pValues2 = Mixture.Mixture(X, Y2 , cpu, 1, '') 
+            result2, pValues2 = Mixture.Mixture(X, Y2 , cpu, 1, '', method=Score) 
             
             betasSim = result2.Subjects[0].MIXprop[0].to_numpy(copy = True)           
             estimate_lines = pd.DataFrame([(betasSim[i] > 0).sum() for i in range(rango)])     
@@ -274,15 +275,15 @@ def update_output(n_clicks, lines_slider, cpu, celllines):
 
             #Celllines analysis
             if len(celllines) == 1:
-                #Y3 = pd.read_excel(dataCelllines, sheet_name = 0)
-                #result3, pValues3 = Mixture.Mixture(X, Y3 , cpu, 1, '')
-                cc = pd.read_excel('./data/outputCellines(2).xlsx', sheet_name = 0) 
-                cc.index = cc.iloc[:,0].astype(int)
-                cc.index.name = 'Subjects'
-                cc2 = pd.read_excel('./data/outputCellines(2).xlsx', sheet_name = 1)
-                cc2.index = cc2.iloc[:,0].astype(int)
-                cc2.index.name = 'Subjects'
-                result3 = [cc.iloc[:, 1:], cc2.iloc[:, 1:]]
+                Y3 = pd.read_excel(dataCelllines, sheet_name = 0)
+                result3, pValues3 = Mixture.Mixture(X, Y3 , cpu, 1, '', method=Score)
+                #cc = pd.read_excel('./data/outputCellines(2).xlsx', sheet_name = 0) 
+                #cc.index = cc.iloc[:,0].astype(int)
+                #cc.index.name = 'Subjects'
+                #cc2 = pd.read_excel('./data/outputCellines(2).xlsx', sheet_name = 1)
+                #cc2.index = cc2.iloc[:,0].astype(int)
+                #cc2.index.name = 'Subjects'
+                #result3 = [cc.iloc[:, 1:], cc2.iloc[:, 1:]]
                 children_tabs = [
                     dcc.Tab(label='Similation Test', value='tab4-1', style={'padding': '0px'}, selected_style={'padding': '0px'}),
                     dcc.Tab(label='False Discovery Test', value='tab4-2', style={'padding': '0px'}, selected_style={'padding': '0px'})
