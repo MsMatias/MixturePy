@@ -10,5 +10,6 @@ app/build/
 Mixture/build/
 Mixture/dist/
 Mixture/Mixture.egg-info/
+data/
 
 MixturePy.spec
