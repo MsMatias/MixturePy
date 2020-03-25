@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import os, math, sys
 
-from sklearn.svm import NuSVR
+from sklearn.svm import LinearSVR
 
 # Function nuSvr (Not import)
 # Run NuSvr with expression Matrix and signature Matrix
@@ -17,12 +17,12 @@ from sklearn.svm import NuSVR
 # @return [Array] [{ float } RMSEpredict, { objet } model]
 def nuSvr(X, Y, nu, delta, verbose = False):
 
-    # Run NuSVR
-    clf = NuSVR(kernel='linear', C=1.0, nu=nu, verbose = verbose)
-    clf.fit(X, Y)
+    # Run eSVR
+    clf = LinearSVR (random_state = 0, max_iter = 40000)
+    model = svr.fit(X, Y)
     
     # Get betas
-    w = clf.coef_
+    w = model.coef_
 
     # Set values i to zero where i < 0
     w = np.where(w<0, 0, w)    
