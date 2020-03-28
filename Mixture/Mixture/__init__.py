@@ -39,7 +39,7 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = None, method = Mixer):
 
         print('Creating population (Count: ' + str(iter) + ')...')
 
-        matRand = Parallel(n_jobs=cores, backend='multiprocessing')(delayed(Utils.sampleRandom)(Y = Y, i = i, verbose = 1) for i in range(iter))
+        matRand = Parallel(n_jobs=cores, backend='threading')(delayed(Utils.sampleRandom)(Y = Y, i = i, verbose = 1) for i in range(iter))
 
         #for i in range(iter):
         #    matRand.append(Utils.sampleRandom(Y, i, 1))

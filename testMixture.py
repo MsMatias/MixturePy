@@ -5,14 +5,14 @@ import Mixture.Utils as mut
 # Load Data Signature
 # LM22 OR TIL10
 
-X = pd.read_excel('EPICsig_signature.xlsx', sheet_name = 0)
+X = pd.read_excel('data/LM22Signature.xlsx', sheet_name = 0)
 
 # Read xlsx expression file
-Y = X #pd.read_excel('EPICsig_betas.xlsx', sheet_name = 0)
-#Y = pd.read_excel('data/Celllines.xlsx', sheet_name = 0)
+#Y = X #pd.read_excel('EPICsig_betas.xlsx', sheet_name = 0)
+Y = pd.read_excel('data/NewmanFL.xlsx', sheet_name = 0)
 
-Y = Y.iloc[: , 1:]
-X = X.iloc[: , 1:]
+#Y = Y.iloc[: , 1:]
+#X = X.iloc[: , 1:]
 
 # Number of cores that will work
 cores = 24
@@ -21,7 +21,7 @@ cores = 24
 iters = 1000
 
 # Name the output file xlsx (without format)
-output = 'Result_Mixture_TIL7_TIL7'
+output = 'Result_Mixture_esvr_newman_lm22'
 
 # Run Mixer Function
 if __name__ == '__main__':

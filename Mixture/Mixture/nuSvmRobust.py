@@ -69,14 +69,15 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
         #w = np.where(w<delta, 0, w)
 
         # Convert array to df
-        w = pd.DataFrame(w[0], XX.columns).T
+        #print(w)
+        w = pd.DataFrame(w, XX.columns).T
         
         # Checking if all the values are NaN
         if w.isnull().all().all():
             wNan = np.empty(len(X.columns))#[0 for x in range(len(X.columns))]
             wNan.fill(np.nan)
             wNan = pd.DataFrame(wNan, X.columns).T
-            result = pd.Series([wNan, wNan, float('NaN'), float('NaN'), float('NaN'), float('NaN'), model.get_params()['nu'], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter'])
+            result = pd.Series([wNan, wNan, float('NaN'), float('NaN'), float('NaN'), float('NaN'), i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp', 'Iter'])
             return result
 
         # Checking if any value is < delta
@@ -90,7 +91,7 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
         if i >= maxIter and maxIter > -1:
             ok = False
 
-    wOut = pd.DataFrame(wAbs[0], XX.columns).T
+    wOut = pd.DataFrame(wAbs, XX.columns).T
 
     # Create wSel with all values in zero
     wSel = [0 for x in range(len(X.columns))]
@@ -115,5 +116,5 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
     #wSel = wSel.where(wSel>delta).fillna(0)
     #w = w.where(w>delta).fillna(0).round(1)
 
-    result = pd.Series([wSel, w, nusvm, nusvmW, corrv[0][1], corrvW[0][1], model.get_params()['nu'], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter'])
+    result = pd.Series([wSel, w, nusvm, nusvmW, corrv[0][1], corrvW[0][1], i], index =['Wa', 'Wp', 'RMSEa', 'RMSEp', 'Ra', 'Rp',  'Iter'])
     return result

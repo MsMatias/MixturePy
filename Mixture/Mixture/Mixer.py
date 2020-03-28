@@ -44,7 +44,7 @@ def Mixer(X, Y, cores):
     out = list()
     print('Processing...')
 
-    out = Parallel(n_jobs=cores, backend='multiprocessing')(delayed(nuSvmRobust)(X = X, Y = j, subject = i, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = -1, verbose = 1) for i, j in Yn.iteritems())
+    out = Parallel(n_jobs=cores, backend='threading')(delayed(nuSvmRobust)(X = X, Y = j, subject = i, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter = -1, verbose = 1) for i, j in Yn.iteritems())
              
     #out = [x.recv() for x in pipe_list]
 
@@ -59,7 +59,7 @@ def Mixer(X, Y, cores):
     for i in out:
         matWa = matWa.append(i.Wa, ignore_index=True)
         matWp = matWp.append(i.Wp, ignore_index=True)
-        matRes = matRes.append(pd.DataFrame([[i.RMSEa, i.RMSEp, i.Ra, i.Rp,  i.BestParams, i.Iter]], columns=['RMSEa', 'RMSEp', 'Ra', 'Rp',  'BestParams', 'Iter']), ignore_index=True)
+        matRes = matRes.append(pd.DataFrame([[i.RMSEa, i.RMSEp, i.Ra, i.Rp, i.Iter]], columns=['RMSEa', 'RMSEp', 'Ra', 'Rp', 'Iter']), ignore_index=True)
   
     matWa.index = Y.columns.values
     matWa.columns = X.columns.values

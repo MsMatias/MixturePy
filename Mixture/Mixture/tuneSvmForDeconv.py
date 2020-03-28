@@ -19,7 +19,7 @@ def nuSvr(X, Y, nu, delta, verbose = False):
 
     # Run eSVR
     clf = LinearSVR (random_state = 0, max_iter = 40000)
-    model = svr.fit(X, Y)
+    model = clf.fit(X, Y)
     
     # Get betas
     w = model.coef_
@@ -39,7 +39,7 @@ def nuSvr(X, Y, nu, delta, verbose = False):
 
     # Get Rmse predict for nuseq
     RmsePredict = math.sqrt(pow((Y - predict),2).mean())
-    return [RmsePredict, clf]
+    return [RmsePredict, model]
 
 # Function tuneSvmForDeconv
 # Create result nuSvr list with nuseq
