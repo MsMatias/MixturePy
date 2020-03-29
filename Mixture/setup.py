@@ -22,7 +22,9 @@ setup(name='Mixture',
             'scikit-learn',
             'joblib',
             'xlrd',
-            'openpyxl'
+            'openpyxl',
+            'xlsxwriter',
+            'multiprocessing'
       ],
       classifiers=[
         "Programming Language :: Python :: 3",
