@@ -2,6 +2,9 @@
 *.xlsx
 *.xls
 
+#Ignore rds files
+*.rds
+
 #Ignore dist and build folder
 build/
 dist/

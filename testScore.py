@@ -8,8 +8,8 @@ import score
 X = pd.read_excel('EPICsig_signature.xlsx', sheet_name = 0)
 
 # Read xlsx expression file
-Y = X#pd.read_excel('EPICsig_betas.xlsx', sheet_name = 0)
-#Y = pd.read_excel('data/Celllines.xlsx', sheet_name = 0)
+#Y = X#pd.read_excel('EPICsig_betas.xlsx', sheet_name = 0)
+Y = pd.read_excel('data/Celllines.xlsx', sheet_name = 0)
 
 Y = Y.iloc[: , 1:]
 X = X.iloc[: , 1:]
@@ -21,7 +21,7 @@ cores = 24
 iters = 1000
 
 # Name the output file xlsx (without format)
-output = 'Result_Score_TIL7_TIL7'
+output = 'Result_esvr_celllines'
 
 # Run Mixer Function
 if __name__ == '__main__':
