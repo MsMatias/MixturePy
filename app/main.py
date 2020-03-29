@@ -49,7 +49,7 @@ app.index_string = '''
         <header>
             ''' + str(logoFile.read()) + '''
             <nav role="menu">  
-                <ul class="navigation">
+                <ul class="navigation" id="nav-menu">
                     <li><a href="/">Mixture</a></li>
                     <li><a href="/validate">Validate MS</a></li>
                 </ul>
@@ -79,4 +79,4 @@ def display_page(pathname):
         return '404'
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, host='0.0.0.0', port=8082)

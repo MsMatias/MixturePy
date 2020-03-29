@@ -128,7 +128,7 @@ are based on 10px sizing. So basically 1.5rem = 15px :) */
 html {
   font-size: 62.5%; }
 body {
-  background-color: #F7F7F7;
+  background-color: rgba(247, 247, 247, 0.4);
   font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;
   font-weight: 400;
@@ -448,16 +448,6 @@ nav ul {
   justify-content: flex-end;
 }
 
-.navigation a {
-  text-decoration: none;  
-  border-left: #333 1px solid;
-  display: block;
-  margin-top: 40px;
-  padding-left: 20px;
-  padding-right: 20px;
-  color: black;
-}
-
 #check_celllines input[type="checkbox"] {
 	-webkit-appearance: none;
 	background-color: #fafafa;
@@ -507,4 +497,79 @@ nav ul {
 	top: 0px;
 	left: 3px;
 	color:#ffffff;
+}
+
+/* Tabs */
+
+.custom-tabs {
+  margin-top: -53px !important;
+  margin-left: 575px !important;
+  margin-bottom: 10px !important;
+}
+
+.custom-tab {
+  width: 200px !important;
+  margin: 5px !important;
+  padding: 5px !important;
+  background-color: white !important;
+  border: none !important;
+  border-bottom: 2px solid grey !important;
+}
+
+.custom-tab-button {
+  display:block;
+  width: 200px !important;
+  margin-top: -46px !important;
+  margin-left: 364px !important;
+  margin-bottom: 10px !important;
+  padding: 5px !important;
+  background-color: white !important;
+  border: none !important;
+  border-bottom: 2px solid grey !important;
+  text-decoration: none;
+  color: black;
+  text-align: center;
+}
+
+.custom-tab-button:hover {
+  color: black;
+  border-bottom: 2px solid dodgerblue !important;
+}
+
+.custom-tab:hover {
+  border-bottom: 2px solid dodgerblue !important;
+}
+
+.custom-tab--selected {
+  border-bottom: 4px solid dodgerblue !important;
+}
+
+.navigation a {
+	text-decoration: none;
+	/* border-left: #333 1px solid; */
+	display: block;
+	margin-top: 40px;
+	/* padding-left: 20px; */
+	/* padding-right: 20px; */
+	/* color: black; */
+	border: none;
+	border-bottom: 2px solid grey;
+	padding-bottom: 5px;
+	margin-left: 5px;
+	margin-right: 5px;
+	width: 190px !important;
+  text-align: center;
+  color: black;
+}
+
+.navigation a:hover {
+	border-bottom: 2px solid dodgerblue;
+}
+
+#output-processing > div {
+  pointer-events:none;
+}
+
+#tabs2-parent, #tabs2-content, .custom-tab-button {
+  pointer-events: all !important;
 }
