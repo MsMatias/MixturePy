@@ -5,7 +5,7 @@ import Mixture.Utils as mut
 # Load Data Signature
 # LM22 OR TIL10
 
-X = pd.read_excel('data/LM22Signature.xlsx', sheet_name = 0)
+X = pd.read_excel('data/TIL10_signature.xlsx', sheet_name = 0)
 
 # Read xlsx expression file
 #Y = X #pd.read_excel('EPICsig_betas.xlsx', sheet_name = 0)
@@ -21,7 +21,7 @@ cores = 24
 iters = 1000
 
 # Name the output file xlsx (without format)
-output = 'Result_Mixture_esvr_newman_lm22'
+output = 'Result_Mixture_esvr_newman_til10'
 
 # Run Mixer Function
 if __name__ == '__main__':

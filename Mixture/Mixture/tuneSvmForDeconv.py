@@ -18,7 +18,7 @@ from sklearn.svm import LinearSVR
 def nuSvr(X, Y, nu, delta, verbose = False):
 
     # Run eSVR
-    clf = LinearSVR (random_state = 0, max_iter = 40000)
+    clf = LinearSVR (random_state = 0, dual = False, loss= 'squared_epsilon_insensitive')
     model = clf.fit(X, Y)
     
     # Get betas
