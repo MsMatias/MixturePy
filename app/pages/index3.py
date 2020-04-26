@@ -37,6 +37,13 @@ output = ''
 urlTil10 = '../data/TIL10_signature.xlsx'
 urlLm22 = '../data/LM22Signature.xlsx'
 
+#result = pd.read_excel('Result_esvr_celllines.xlsx', sheet_name = 0) 
+
+proportions =  pd.read_excel('./Result_esvr_celllines.xlsx', sheet_name = 1,index_col = 0) 
+metricas = pd.read_excel('./Result_esvr_celllines.xlsx', sheet_name = 2,index_col = 0) 
+absolutos = pd.read_excel('./Result_esvr_celllines.xlsx', sheet_name = 0,index_col = 0) 
+
+
 def find_data_file(filename):
     if getattr(sys, 'frozen', False):
         # The application is frozen
@@ -97,8 +104,8 @@ layout = html.Div([
             id='cpu-slider',
             min=1,
             max=multiprocessing.cpu_count(),
-            step=2,
-            marks={i: '{}'.format(i) for i in range(1, multiprocessing.cpu_count()+2, 3)},
+            step=1,
+            marks={i: '{}'.format(i) for i in range(multiprocessing.cpu_count()+1)},
             value=multiprocessing.cpu_count()
         ),  
         html.Button('Submit', id='button', style = {
@@ -144,17 +151,17 @@ layout = html.Div([
 @app.callback(Output('tabs-content', 'children'),
               [Input('tabs', 'value')])
 def render_content1(tab):
-    global result
-    count = len(result.Subjects[0].MIXprop[0])
+    global proportions, metricas, absolutos
+    count = len(proportions)
     if tab == 'tab-1':
-        xLabel = result.Subjects[0].MIXprop[0].index
-        columns = result.Subjects[0].MIXprop[0].columns        
+        xLabel = proportions.index
+        columns = proportions.columns        
         return html.Div([
             html.H3('Bar Plot Subject-Proportions'),
             dcc.Graph(
                 id='graph-1-tabs',
                 figure=go.Figure(                    
-                    data=[go.Bar(x=xLabel, y=[result.Subjects[0].MIXprop[0].iloc[j].values[i] for j in range(count)], name = columns[i]) for i in range(len(columns))],
+                    data=[go.Bar(x=xLabel, y=[proportions.iloc[j].values[i] for j in range(count)], name = columns[i]) for i in range(len(columns))],
                     layout=go.Layout(
                         barmode='relative',
                         title_text='Bar Plot',
@@ -165,15 +172,15 @@ def render_content1(tab):
             )
         ])
     elif tab == 'tab-2':
-        items = [result.Subjects[0].MIXprop[0].iloc[j].values for j in range(len(result.Subjects[0].MIXprop[0]))]        
+        items = [proportions.iloc[j].values for j in range(len(proportions))]        
         return html.Div([
             html.H3('Heatmaps of estimated cell-type proportion values'),
             dcc.Graph(
                 id='graph-2',
                 figure=go.Figure(data=go.Heatmap(
                     z=np.transpose(items),
-                    x=result.Subjects[0].MIXprop[0].index,
-                    y=result.Subjects[0].MIXprop[0].columns,
+                    x=proportions.index,
+                    y=proportions.columns,
                     colorscale= [
                         [0.0, 'rgb(255,255,255)'],
                         [1.0, 'rgb(255,0,0)']
@@ -187,16 +194,16 @@ def render_content1(tab):
             )
         ])
     elif tab == 'tab-3':
-        mean = np.mean(result.Subjects[0].ACCmetrix[0].IscBySbj.values)
-        std = np.std(result.Subjects[0].ACCmetrix[0].IscBySbj.values)
+        mean = np.mean(metricas.IscBySbj.values)
+        std = np.std(metricas.IscBySbj.values)
         return html.Div([
             html.H3('Immuno Content Score (Population Based)'),
             dcc.Graph(
                 id='graph-2',
                 figure=go.Figure(
                     data=[go.Scatter(
-                        x=result.Subjects[0].ACCmetrix[0].index, 
-                        y=result.Subjects[0].ACCmetrix[0].IscBySbj.values, 
+                        x=metricas.index, 
+                        y=metricas.IscBySbj.values, 
                         mode='markers'
                     )],
                     layout=go.Layout(
@@ -253,7 +260,7 @@ def render_content2(tab):
     if not ctx.triggered[0]['value']:
         return no_update
 
-    global result
+    global proportions, metricas, absolutos
 
     if tab == 'tab2-1':
         return html.Div([
@@ -261,9 +268,9 @@ def render_content2(tab):
             html.A('Download result', href='/download_result/')
         ])
     elif tab == 'tab2-2':
-        absolute = result.Subjects[0].MIXabs[0].reset_index()
-        proportions = result.Subjects[0].MIXprop[0].reset_index()
-        metrics = result.Subjects[0].ACCmetrix[0].reset_index()
+        absolute = absolutos.reset_index()
+        proportions = proportions.reset_index()
+        metrics = metricas.reset_index()
         return html.Div([
             #dcc.Tabs(id='tabs3', value='tab3-1', children=[
             #    dcc.Tab(label='Absolute', value='tab3-1'),
@@ -271,7 +278,7 @@ def render_content2(tab):
             #    dcc.Tab(label='Metrics', value='tab3-3'),
             #]),
             html.Div([
-                html.H1(children='Absolute'),
+                html.H1(children='Absolut'),
                 dt.DataTable(id='table-absolute', data=absolute.to_dict('records'), columns = [{"name": i, "id": i} for i in absolute.columns], style_table={'overflowX': 'scroll'})
             ]),
             html.Div([
@@ -284,12 +291,12 @@ def render_content2(tab):
             ])
         ])
     elif tab == 'tab2-3':
-        count = len(result.Subjects[0].MIXprop[0])
-        xLabel = result.Subjects[0].MIXprop[0].index
-        columns = result.Subjects[0].MIXprop[0].columns 
-        items = [result.Subjects[0].MIXprop[0].iloc[j].values for j in range(len(result.Subjects[0].MIXprop[0]))]
-        mean = np.mean(result.Subjects[0].ACCmetrix[0].IscBySbj.values)
-        std = np.std(result.Subjects[0].ACCmetrix[0].IscBySbj.values)
+        count = len(proportions)
+        xLabel = proportions.index
+        columns = proportions.columns 
+        items = [proportions.iloc[j].values for j in range(len(proportions))]
+        mean = np.mean(metricas.IscBySbj.values)
+        std = np.std(metricas.IscBySbj.values)
         return html.Div([
             #dcc.Tabs(id='tabs', value='tab-1', children=[
             #    dcc.Tab(label='Bar Plot', value='tab-1'),
@@ -303,7 +310,7 @@ def render_content2(tab):
                 dcc.Graph(
                     id='graph-1-tabs',
                     figure=go.Figure(                    
-                        data=[go.Bar(x=xLabel, y=[result.Subjects[0].MIXprop[0].iloc[j].values[i] for j in range(count)], name = columns[i]) for i in range(len(columns))],
+                        data=[go.Bar(x=xLabel, y=[proportions.iloc[j].values[i] for j in range(count)], name = columns[i]) for i in range(len(columns))],
                         layout=go.Layout(
                             barmode='relative',
                             title_text='Bar Plot',
@@ -319,8 +326,8 @@ def render_content2(tab):
                     id='graph-2',
                     figure=go.Figure(data=go.Heatmap(
                         z=np.transpose(items),
-                        x=result.Subjects[0].MIXprop[0].index,
-                        y=result.Subjects[0].MIXprop[0].columns,
+                        x=proportions.index,
+                        y=proportions.columns,
                         colorscale= [
                             [0.0, 'rgb(255,255,255)'],
                             [1.0, 'rgb(255,0,0)']
@@ -339,8 +346,8 @@ def render_content2(tab):
                     id='graph-2',
                     figure=go.Figure(
                         data=[go.Scatter(
-                            x=result.Subjects[0].ACCmetrix[0].index, 
-                            y=result.Subjects[0].ACCmetrix[0].IscBySbj.values, 
+                            x=metricas.index, 
+                            y=metricas.IscBySbj.values, 
                             mode='markers'
                         )],
                         layout=go.Layout(
@@ -393,10 +400,10 @@ def render_content2(tab):
 #@app.callback([Output('tabs3-content', 'data'), Output('tabs3-content', 'columns')],
 #              [Input('tabs3', 'value')])
 #def update_data(tab):
-#    global result
-#    absolute = result.Subjects[0].MIXabs[0].reset_index()
-#    proportions = result.Subjects[0].MIXprop[0].reset_index()
-#    metrics = result.Subjects[0].ACCmetrix[0].reset_index()
+#    global proportions, metricas, absolutos
+#    absolute = absolutos.reset_index()
+#    proportions = proportions.reset_index()
+#    metrics = metricas.reset_index()
 #    if tab == 'tab3-1':
 #        return [absolute.to_dict('records'), [{"name": i, "id": i} for i in absolute.columns]]
 #    elif tab == 'tab3-2':
@@ -454,19 +461,19 @@ def update_output(n_clicks, signature, cpu, population):
     
     if n_clicks is not None:
         
-        if signature == 'LM22':
-            X = pd.read_excel(find_data_file(urlLm22), sheet_name = 0)
-        elif signature == 'TIL10':
-            X = pd.read_excel(find_data_file(urlTil10), sheet_name = 0)
-        
-        Y = pd.read_excel(expression, sheet_name = 0) 
-        
-        #if __name__ == '__main__':            
-        #if __name__ == 'app':
-        if True:
-            result, pValues = Mixture.Mixture(X, Y , cpu, int(population), '')
-            
-            metrics = result.Subjects[0].ACCmetrix[0].reset_index()
+        #if signature == 'LM22':
+        #    X = pd.read_excel(find_data_file(urlLm22), sheet_name = 0)
+        #elif signature == 'TIL10':
+        #    X = pd.read_excel(find_data_file(urlTil10), sheet_name = 0)
+        #
+        #Y = pd.read_excel(expression, sheet_name = 0) 
+        #
+        ##if __name__ == '__main__':            
+        ##if __name__ == 'app':
+        #if True:
+        #    result, pValues = Mixture.Mixture(X, Y , cpu, int(population), '')
+        #    
+        #    metrics = metricas.reset_index()
             
         children = [
             html.A('Download', href='/download_result/', className='custom-tab-button'),   
@@ -489,13 +496,13 @@ def update_output(n_clicks, signature, cpu, population):
 @app.server.route('/download_result/')
 def download_excel ():
     
-    global result, pValues, filename_expression
+    global proportions, metricas, absolutos, pValues, filename_expression
     
     strIO = io.BytesIO()
     excel_writer = pd.ExcelWriter(strIO, engine="xlsxwriter")
-    result.Subjects[0].MIXabs[0].to_excel(excel_writer, sheet_name='Absolute')
-    result.Subjects[0].MIXprop[0].to_excel(excel_writer, sheet_name='Proportions')
-    result.Subjects[0].ACCmetrix[0].to_excel(excel_writer, sheet_name='Metrics')
+    absolutos.to_excel(excel_writer, sheet_name='Absolute')
+    proportions.to_excel(excel_writer, sheet_name='Proportions')
+    metricas.to_excel(excel_writer, sheet_name='Metrics')
     #if pValues is not None:
     #    pValues.to_excel(excel_writer, sheet_name='Pvalues')
     result.usedGenes[0].to_excel(excel_writer, sheet_name='UsedGenes', index=False)
