@@ -8,14 +8,14 @@ from Mixture.Mixer import Mixer
 import Mixture.Utils as Utils
 from joblib import Parallel, delayed
 
-def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
+def Mixture (X, Y, cores = 1, iter = 100, nameFile = None, method = Mixer):
     
     # Intersection between X and Y
     geneList = X.loc[X['Gene symbol'].isin(Y['Gene symbol'])].sort_values(by=['Gene symbol'])['Gene symbol']
 
     print('Running mixer with subjects (Count: ' + str(Y.shape[1]) + ')...')
     # Run Mixer Function with original Expressions
-    orig = Mixer(X, Y, cores)
+    orig = method(X, Y, cores)
 
     print('Finish mixer')
     
@@ -55,7 +55,7 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
 
         print('Running mixer with porpulationBased (Count: ' + str(matRand.shape[1]) + ')')
         # Run Mixer Function with Random Matrix
-        outMix = Mixer(X, matRand, cores)
+        outMix = method(X, matRand, cores)
 
         #geneList = pd.DataFrame(geneList)
 
@@ -68,22 +68,20 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = 'output'):
         pValues = result.Subjects[0].ACCmetrix[0].apply(Utils.getPValues, args=(result.PermutedMetrix[0], ), axis = 1)
         pValues = pd.DataFrame(pValues.values.tolist(), index = pValues.index, columns=['RMSEa', 'RMSEa', 'Ra', 'Rp']) 
 
-        print('Finish')
-
-        Utils.generateXlsx (result, pValues, nameFile)
-
-        return result, pValues
     else:
         
         result = pd.DataFrame([orig, geneList], ['Subjects', 'usedGenes']).T
 
         result.usedGenes[0] = pd.DataFrame(result.usedGenes[0])
-        
-        print('Finish')
 
-        Utils.generateXlsx (result, None, nameFile)
+        pValues = list()
 
-        return result, None
+    print('Finish')
+
+    if nameFile is not None:
+        Utils.generateXlsx (result, pValues, nameFile)
+
+    return result, pValues
 
 
 

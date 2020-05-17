@@ -24,9 +24,12 @@ def loadSignature(sig):
     elif sig == 'TIL10' or sig == 'til10':      
         resource_path = pkg_resources.resource_filename(__name__, '/data/TIL10_signature.xlsx')
         signature = pd.read_excel(resource_path, sheet_name = 0)
+    elif sig == 'TIL9' or sig == 'til9':      
+        resource_path = pkg_resources.resource_filename(__name__, '/data/TIL9_signature.xlsx')
+        signature = pd.read_excel(resource_path, sheet_name = 0)
     else:
         signature = None
-        print('Error, Type "LM22" or "TIL10"')    
+        print('Error, Type "LM22", "TIL10" or "TIL9')    
     
     return signature
 

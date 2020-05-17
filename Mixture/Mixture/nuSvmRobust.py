@@ -1,8 +1,6 @@
 # !/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
 from __future__ import print_function
 import numpy as np
 import pandas as pd
@@ -54,8 +52,11 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
 
         # Get betas
         w = model.coef_
+
+        w.setflags(write=1)
         
         # Set values i to zero where i < 0
+        #w[w < 0] = 0
         w = np.where(w<0, 0, w)
 
         # Save new betas backup
@@ -63,7 +64,7 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
         
         # Normalize data
         w = w/np.sum(w)
-        
+
         # Set values i to zero where i < delta
         #w = np.where(w<delta, 0, w)
 

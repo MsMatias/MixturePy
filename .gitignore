@@ -2,6 +2,9 @@
 *.xlsx
 *.xls
 
+#Ignore rds files
+*.rds
+
 #Ignore dist and build folder
 build/
 dist/
@@ -10,5 +13,6 @@ app/build/
 Mixture/build/
 Mixture/dist/
 Mixture/Mixture.egg-info/
+data/
 
 MixturePy.spec
