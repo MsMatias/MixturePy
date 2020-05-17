@@ -67,8 +67,10 @@ def Mixer(X, Y, cores):
     matWp.index = Y.columns.values
     matWp.columns = X.columns.values
 
-    print(X.columns.values)
+    matWa.index.name = 'SubjectID'
+    matWp.index.name = 'SubjectID'
 
     matRes.index = matWp.index.values
+    matRes.index.name = 'CellTypes'
 
     return(pd.DataFrame([[matWa, matWp, matRes]], columns=['MIXabs', 'MIXprop', 'ACCmetrix']))

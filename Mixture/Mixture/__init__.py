@@ -63,16 +63,21 @@ def Mixture (X, Y, cores = 1, iter = 100, nameFile = None, method = Mixer):
 
         result.usedGenes[0] = pd.DataFrame(result.usedGenes[0])
 
+        result.usedGenes[0].columns = ['UsedGenes']
+
         pValues = list()
 
         pValues = result.Subjects[0].ACCmetrix[0].apply(Utils.getPValues, args=(result.PermutedMetrix[0], ), axis = 1)
-        pValues = pd.DataFrame(pValues.values.tolist(), index = pValues.index, columns=['RMSEa', 'RMSEa', 'Ra', 'Rp']) 
+        pValues = pd.DataFrame(pValues.values.tolist(), index = pValues.index, columns=['RMSEa', 'RMSEa', 'Ra', 'Rp'])
+        pValues.index.name = 'CellTypes'
 
     else:
         
         result = pd.DataFrame([orig, geneList], ['Subjects', 'usedGenes']).T
 
         result.usedGenes[0] = pd.DataFrame(result.usedGenes[0])
+
+        result.usedGenes[0].columns = ['UsedGenes']
 
         pValues = list()
 

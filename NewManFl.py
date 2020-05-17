@@ -4,19 +4,19 @@ import Mixture.Utils as mut
 
 # Load Data Signature
 # LM22 OR TIL10
-X = pd.read_excel('data/TIL10_signature.xlsx', sheet_name = 0) 
+X = mut.loadSignature('LM22')
 
 # Read xlsx expression file
-Y = pd.read_excel('data/TIL10_signature.xlsx', sheet_name = 0) 
+Y = pd.read_excel('data/NewmanFL.xlsx', sheet_name = 0) 
 
 # Number of cores that will work
-cores = 24
+cores = 4
 
 # Number of permutation samples
 iters = 50
 
 # Name the output file xlsx (without format)
-output = 'Result_TIL10_MIXTURE_22'
+output = 'Result_Newman'
 
 # Run Mixer Function
 if __name__ == '__main__':
