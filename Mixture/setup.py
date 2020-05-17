@@ -23,8 +23,7 @@ setup(name='Mixture',
             'joblib',
             'xlrd',
             'openpyxl',
-            'xlsxwriter',
-            'multiprocessing'
+            'xlsxwriter'
       ],
       classifiers=[
         "Programming Language :: Python :: 3",

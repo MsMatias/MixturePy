@@ -65,7 +65,7 @@ def nuSvmRobust(X, Y, subject, nuseq = [0.25,0.5,0.75], delta = 0.007, maxIter =
         w = w/np.sum(w)
         
         # Set values i to zero where i < delta
-        w = np.where(w<delta, 0, w)
+        #w = np.where(w<delta, 0, w)
 
         # Convert array to df
         w = pd.DataFrame(w[0], XX.columns).T

@@ -10,10 +10,10 @@ X = mut.loadSignature('LM22')
 Y = pd.read_excel('data/NewmanFL.xlsx', sheet_name = 0) 
 
 # Number of cores that will work
-cores = 4
+cores = 24
 
 # Number of permutation samples
-iters = 500
+iters = 50
 
 # Name the output file xlsx (without format)
 output = 'Result_Newman'
