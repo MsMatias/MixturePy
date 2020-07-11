@@ -4,6 +4,9 @@ A v-SVR based noise constrained Recursive Feature Extraction algorithm for robus
 
 Since the significant impact of immunotherapy in cancer, the estimation of the immune cell-type proportions present in a tumor becomes crucial. Currently, the deconvolution of the cell mixture content of a tumor is carried out by different analytic tools, yet the accuracy of inferred cell type proportions has room for improvement. We improve tumor immune environment characterization developing MIXTURE, an analytical method based on a noise constrained recursive variable selection for a support vector regression
 
+# NOTE:
+The MIXTURE dash App has been only tested on Linux. The Mixture Package code was tested on Linux, Windows and Mac. On windows only one CPU core is allowed.
+
 ## Getting Started
 
 * [User Guide](https://github.com/MsMatias/MixturePy/wiki/Getting-Started)
