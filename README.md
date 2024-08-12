@@ -27,7 +27,7 @@ The current "functional like" version of the software requires the following lib
  * joblib
  
 ## Download & Installing MIXTURE PACKAGE
-* [Click Here](https://github.com/MsMatias/MixturePy/wiki/Download-&-Installation-Mixture-Package)
+* [Click Here](https://github.com/MsMatias/MixturePy/wiki/Download-&-Installation-Mixture-Module)
 
 ## Running MIXTURE PACKAGE
 
