@@ -46,7 +46,7 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Authors
 
-* **Elmer Andrés Fernández** - *Initial work* - CONICET, Universidad Catolica de Cordoba - [Profile](https://www.researchgate.net/profile/Elmer_Fernandez)
+* **Elmer Andrés Fernández** - *Initial work* - CONICET, [Scirelab](https://scirelab.org.ar/), [Fundación para el progreso de la Medicina -FPM](https://fpmlab.org.ar/) - [Profile](https://www.researchgate.net/profile/Elmer_Fernandez)
 * **Miranda Matias Samuel** - *Developer* -  Universidad Catolica de Cordoba
 
 ## License
